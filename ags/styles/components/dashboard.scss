@@ -1,0 +1,205 @@
+@use "./popups" as *;
+
+@mixin dashboard {
+    .dashLeft {
+        min-width: 360px;
+        .dashMpris {
+            /* margin-bottom: var(--rpt-spacing); */
+            .mprisBox {
+                border-radius: var(--rpt-spacing);
+                margin-bottom: var(--rpt-spacing);
+                box-shadow: 1px 1px 1px var(--border-color);
+                .musicPanel {
+                    border-radius: var(--rpt-spacing) var(--rpt-spacing) 0 0;
+                    background: linear-gradient(
+                        to right,
+                        var(--rpt-rose),
+                        var(--rpt-pine)
+                    );
+
+                    label {
+                        color: var(--rpt-base);
+                        font-size: 13px;
+                        min-height: 20px;
+                        font-family: var(--rpt-font-family);
+                    }
+
+                    .coverArt avatar {
+                        border-radius: var(--rpt-spacing) 0 0 0;
+                    }
+
+                    .info {
+                        padding: var(--rpt-spacing);
+                        padding-bottom: 4px;
+                        label {
+                            font-family: var(--rpt-font-family);
+                        }
+                    }
+                }
+
+                .controlPanel {
+                    background-color: var(--rpt-surface);
+                    /* border: 1px solid var(--border-color); */
+                    border-radius: 0 0 var(--rpt-spacing) var(--rpt-spacing);
+                    progressbar {
+                        /* margin: 0 0 var(--rpt-spacing) 0; */
+                        trough {
+                            border-radius: 0;
+                            min-height: 3px;
+                            background-color: var(--rpt-text);
+                            progress {
+                                border-radius: 0;
+                                /* background-color: var(--rpt-base); */
+                                background: linear-gradient(
+                                    to right,
+                                    var(--border-color),
+                                    var(--rpt-overlay)
+                                );
+                            }
+                        }
+                    }
+                    .playerControls {
+                        padding: var(--rpt-spacing);
+
+                        button {
+                            padding: 0px;
+                            margin: 0 4px;
+                            -gtk-icon-size: 12px;
+                            border-radius: 999px;
+                        }
+                    }
+                }
+            }
+
+            box.separator {
+                margin-bottom: var(--rpt-spacing);
+                button {
+                    border-radius: var(--rpt-round);
+                    padding: 2px;
+                }
+
+                .notify button {
+                    min-width: 36px;
+                    margin-right: var(--rpt-spacing);
+                }
+
+                .switcher button {
+                    margin-left: var(--rpt-spacing);
+                    -gtk-icon-shadow: var(--rpt-overlay) 1px 1px 4px;
+                }
+            }
+        }
+
+        .dashNotif {
+            .empty {
+                color: var(--rpt-muted);
+                font-size: 72px;
+            }
+
+            .footer {
+                margin-top: var(--rpt-spacing);
+            }
+
+            .notifications {
+                background-color: transparent;
+                border-radius: var(--rpt-spacing);
+                @include notifRow;
+            }
+        }
+    }
+
+    .dashRight {
+        margin-left: var(--rpt-spacing);
+        min-width: 280px;
+
+        calendar.view {
+            margin-top: var(--rpt-spacing);
+            color: var(--rpt-text);
+            background-color: transparent;
+            /* border: none; */
+            /* border: 1px solid var(--border-color); */
+            header {
+                border-bottom: 1px solid var(--rpt-overlay);
+                border-radius: 8px 8px 0 0;
+                padding: 4px;
+            }
+            border-radius: 8px;
+            grid label {
+                padding: 6px 0;
+            }
+        }
+
+        .dashClock {
+            margin: var(--rpt-spacing) 0;
+            padding: var(--rpt-spacing) 0;
+            grid {
+                padding: 4px;
+                label {
+                    font-size: 0;
+                    min-height: 16px;
+                    min-width: 16px;
+                    border-radius: 3px;
+                    background-color: var(--rpt-overlay-blur);
+                    margin: 1px;
+
+                    &.on {
+                        background-color: var(--rpt-pine);
+                    }
+
+                    &.blink {
+                        background-color: var(--rpt-rose);
+                    }
+
+                    &.on.blink {
+                        background-color: var(--rpt-iris);
+                    }
+                }
+            }
+        }
+
+        .weatherInfo {
+            /* background: linear-gradient(
+                to right,
+                var(--rpt-overlay),
+                var(--rpt-base),
+                var(--rpt-overlay)
+            ); */
+            /* background: var(--rpt-base-blur); */
+            /* border: 1px solid var(--rpt-muted); */
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            image.todayIcon {
+                -gtk-icon-size: 72px;
+                margin-right: var(--rpt-spacing);
+            }
+
+            .infoItem {
+                -gtk-icon-size: 28px;
+                margin: 1px 0;
+            }
+
+            .infoStatus {
+                padding: 4px var(--rpt-spacing);
+                font-size: 13px;
+                color: var(--rpt-muted);
+                border-top: 1px solid var(--rpt-overlay);
+            }
+        }
+
+        .forcast {
+            /* background-color: var(--rpt-surface); */
+            margin: var(--rpt-spacing) 0;
+            /* border: 1px solid var(--border-color); */
+            border-radius: 8px;
+            -gtk-icon-size: 36px;
+            font-size: 13px;
+            color: var(--rpt-muted);
+            image {
+                margin-bottom: var(--rpt-spacing);
+            }
+            box {
+                margin: 4px;
+            }
+        }
+    }
+}

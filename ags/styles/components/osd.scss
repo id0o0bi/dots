@@ -1,0 +1,20 @@
+window#osd {
+    /* padding: var(--rpt-spacing); */
+    margin-bottom: 128px;
+    background-color: transparent;
+
+    box {
+        padding: 16px 32px;
+        -gtk-icon-size: 72px;
+        /* min-height: 128px;
+        min-width: 128px; */
+        margin: var(--rpt-spacing);
+        border: 1px solid var(--rpt-overlay);
+        border-radius: var(--rpt-spacing);
+        background-color: var(--rpt-base-blur);
+    }
+
+    label {
+        margin-top: var(--rpt-spacing);
+    }
+}

@@ -1,0 +1,81 @@
+@mixin notifRow {
+    row,
+    box.row {
+        padding: 0;
+        min-width: 360px;
+        margin-bottom: var(--rpt-spacing);
+        border-radius: var(--rpt-spacing);
+        border: 1px solid var(--border-color);
+        /* background-color: var(--rpt-base); */
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        .content {
+            border-radius: var(--rpt-spacing);
+            padding: var(--rpt-spacing);
+            /* background-color: red; */
+            .image {
+                margin-right: 4px;
+            }
+
+            .title-box {
+                margin-top: 2px;
+                /* background-color: grey; */
+                button {
+                    padding: 0;
+                    margin: 0;
+                    margin-left: var(--rpt-spacing);
+                    border-radius: var(--rpt-round);
+                }
+
+                label {
+                    min-height: 24px;
+                    &.critical {
+                        color: var(--rpt-love);
+                    }
+                }
+            }
+
+            label.body {
+                font-size: 13px;
+                margin-top: var(--rpt-spacing);
+            }
+
+            .actions button {
+                padding: 2px 12px;
+                font-weight: 400;
+                font-size: 13px;
+                margin: var(--rpt-spacing) var(--rpt-spacing) 0 0;
+                border-radius: 200px;
+            }
+        }
+
+        .status {
+            border-top: 1px solid var(--rpt-overlay);
+            padding: 4px var(--rpt-spacing);
+            label {
+                font-size: 13px;
+                color: var(--rpt-muted);
+            }
+        }
+    }
+}
+
+window#popups {
+    background-color: transparent;
+    padding: var(--rpt-spacing);
+    transition-duration: 200ms;
+    transition-timing-function: ease-in-out;
+    .popups {
+        background-color: transparent;
+        @include notifRow;
+        row,
+        box.row {
+            background-color: var(--rpt-base-blur);
+            border-color: var(--border-color);
+        }
+    }
+    /* } */
+}

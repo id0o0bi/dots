@@ -1,0 +1,205 @@
+@use "../common" as *;
+@use "../colors" as *;
+@use "./dashboard" as *;
+
+window#bar {
+    min-height: 27px;
+    border-bottom: 1px solid var(--rpt-overlay);
+    background: var(--rpt-base);
+
+    popover {
+        padding-top: 5px;
+        color: var(--rpt-text);
+        font-family: var(--rpt-font-family);
+        contents {
+            background-color: var(--rpt-base);
+            color: var(--rpt-text);
+            min-width: 240px;
+        }
+        button.round-btn {
+            margin-right: var(--rpt-spacing);
+        }
+    }
+
+    .centerbox {
+        menubutton.unset > button,
+        button.unset {
+            all: unset;
+        }
+
+        > :first-child.workspace {
+            label.clientTitle {
+                font-weight: bold;
+                font-size: 14px;
+                min-height: 20px;
+                margin: 0 var(--rpt-spacing);
+            }
+
+            button {
+                all: unset;
+                margin-left: var(--rpt-spacing);
+                font-size: 0;
+
+                min-height: 5px;
+                min-width: 5px;
+                border-radius: 50px;
+                color: var(--rpt-text);
+                background-color: var(--rpt-pine);
+                transition: 100ms;
+
+                &.focused,
+                &.occupied {
+                    background-color: transparent;
+                    font-size: var(--rpt-font-size);
+                }
+
+                &.focused {
+                    color: var(--rpt-rose);
+                }
+            }
+        }
+
+        > :nth-child(2) {
+            .dashButton {
+                .time {
+                    margin: 0 8px;
+                }
+            }
+            .todayIcon {
+                -gtk-icon-shadow: var(--rpt-text) 1px 1px 4px;
+            }
+
+            @include dashboard;
+        }
+
+        > :last-child {
+            -gtk-icon-size: 14px;
+            menubutton > button {
+                margin-right: var(--rpt-spacing);
+                margin-left: 4px;
+            }
+
+            .err {
+                color: var(--rpt-rose);
+            }
+
+            box.textStream {
+                /* background-color: var(--rpt-surface); */
+                border-radius: var(--rpt-round);
+                padding: 0 var(--rpt-spacing);
+                margin: 2px var(--rpt-spacing);
+                font-size: 14px;
+                label {
+                    min-height: 20px;
+                }
+                button {
+                    margin-left: var(--rpt-spacing);
+                    color: var(--rpt-muted);
+                    &:hover {
+                        color: var(--rpt-text);
+                    }
+                    -gtk-icon-size: 14px;
+                }
+            }
+
+            menubutton.tools {
+                @keyframes shape-shift {
+                    0% {
+                        border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+                        background-position: 0% 0%;
+                        /* transform: translate3d(0, 0, 0) rotateZ(0.01deg); */
+                    }
+                    34% {
+                        border-radius: 70% 30% 46% 54% / 30% 29% 71% 70%;
+                        background-position: 50% 50%;
+                        /* transform: translate3d(0, 5px, 0) rotateZ(0.01deg); */
+                    }
+                    50% {
+                        background-position: 100% 100%;
+                        /* transform: translate3d(0, 0, 0) rotateZ(0.01deg); */
+                    }
+                    67% {
+                        border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+                        background-position: 50% 50%;
+                        /* transform: translate3d(0, -3px, 0) rotateZ(0.01deg); */
+                    }
+                    100% {
+                        border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+                        background-position: 0% 0%;
+                        /* transform: translate3d(0, 0, 0) rotateZ(0.01deg); */
+                    }
+                }
+
+                .animator {
+                    /* background-color: teal; */
+                    min-height: 16px;
+                    min-width: 16px;
+                    &.on {
+                        font-size: 0;
+                        background: linear-gradient(
+                            315deg,
+                            rgba(101, 0, 94, 1) 3%,
+                            rgba(60, 132, 206, 1) 38%,
+                            rgba(48, 238, 226, 1) 68%,
+                            rgba(255, 25, 25, 1) 98%
+                        );
+                        background-size: 400% 400%;
+                        animation: shape-shift 5s linear infinite;
+                    }
+                }
+            }
+
+            scrolledwindow.updates {
+                /* background-color: var(--rpt-pine); */
+                /* border: 1px solid var(--border-color); */
+                scrollbar slider {
+                    min-height: 1px;
+                }
+
+                border-radius: var(--rpt-spacing);
+                .packages {
+                    border-radius: var(--rpt-spacing);
+                    row {
+                        padding: var(--rpt-spacing);
+                        color: var(--rpt-text);
+                        border-bottom: 1px dashed var(--border-color);
+
+                        &:first-child {
+                            border-top-left-radius: var(--rpt-spacing);
+                            border-top-right-radius: var(--rpt-spacing);
+                        }
+
+                        &:last-child {
+                            border: 0px;
+                            border-bottom-left-radius: var(--rpt-spacing);
+                            border-bottom-right-radius: var(--rpt-spacing);
+                        }
+                    }
+                }
+            }
+
+            .volumeRocker {
+                .control {
+                    button.round-btn {
+                        margin-right: 0;
+                    }
+                    margin-bottom: var(--rpt-spacing);
+                }
+            }
+
+            .wifiIcons {
+                image {
+                    -gtk-icon-size: 16px;
+                    margin: 1px 3px;
+                    /* background-color: firebrick; */
+                }
+
+                /* background-color: cadetblue; */
+                > label.pass {
+                    font-size: 8px;
+                    /* margin: 0 0 1px 0; */
+                }
+            }
+        }
+    }
+}

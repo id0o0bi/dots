@@ -1,0 +1,53 @@
+@use "sass:map";
+@use "colors" as *;
+
+:root {
+    --rpt-base-blur: #{map.get($theme-colors, $theme-prefer, "base_blur")};
+    --rpt-surface-blur: #{map.get($theme-colors, $theme-prefer, "surface_blur")};
+    --rpt-overlay-blur: #{map.get($theme-colors, $theme-prefer, "overlay_blur")};
+    --rpt-base: #{map.get($theme-colors, $theme-prefer, "base")};
+    --rpt-surface: #{map.get($theme-colors, $theme-prefer, "surface")};
+    --rpt-overlay: #{map.get($theme-colors, $theme-prefer, "overlay")};
+    --rpt-muted: #{map.get($theme-colors, $theme-prefer, "muted")};
+    --rpt-subtle: #{map.get($theme-colors, $theme-prefer, "subtle")};
+    --rpt-text: #{map.get($theme-colors, $theme-prefer, "text")};
+    --rpt-love: #{map.get($theme-colors, $theme-prefer, "love")};
+    --rpt-gold: #{map.get($theme-colors, $theme-prefer, "gold")};
+    --rpt-rose: #{map.get($theme-colors, $theme-prefer, "rose")};
+    --rpt-pine: #{map.get($theme-colors, $theme-prefer, "pine")};
+    --rpt-foam: #{map.get($theme-colors, $theme-prefer, "foam")};
+    --rpt-iris: #{map.get($theme-colors, $theme-prefer, "iris")};
+    --rpt-highlightLow: #{map.get($theme-colors, $theme-prefer, "highlightLow")};
+    --rpt-highlightMed: #{map.get($theme-colors, $theme-prefer, "highlightMed")};
+    --rpt-highlightHigh: #{map.get(
+            $theme-colors,
+            $theme-prefer,
+            "highlightHigh"
+        )};
+    --rpt-contrastWhite: #{map.get(
+            $theme-colors,
+            $theme-prefer,
+            "contrastWhite"
+        )};
+    --rpt-contrastBlack: #{map.get(
+            $theme-colors,
+            $theme-prefer,
+            "contrastBlack"
+        )};
+
+    --rpt-mask: rgba(0, 0, 0, 0.05);
+    --rpt-spacing: 8px;
+    --rpt-font-size: 16px;
+    --rpt-round: 9999px;
+    --rpt-font-family: "UbuntuMono Nerd Font Propo, Twitter Color Emoji, PingFang SC";
+}
+
+window {
+    color: var(--rpt-text);
+    font-size: var(--rpt-font-size);
+    font-family: var(--rpt-font-family);
+}
+
+button.round-btn {
+    border-radius: var(--rpt-round);
+}

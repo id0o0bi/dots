@@ -1,0 +1,59 @@
+@use "sass:color";
+
+window#launcher {
+    background: var(--rpt-base-blur);
+    /* background-color: var(--rpt-mask); */
+
+    box#launcher-content {
+        entry {
+            all: unset;
+            min-width: 360px;
+            min-height: 36px;
+            border-radius: 200px;
+            background-color: transparent;
+            border: 2px solid var(--rpt-pine);
+            padding: 0 24px;
+            font-size: 18px;
+            margin: 50px 0;
+        }
+
+        flowbox {
+            > flowboxchild {
+                margin: var(--rpt-spacing);
+                button.app-item {
+                    background-color: transparent;
+                    min-width: 168px;
+                    min-height: 156px;
+
+                    label {
+                        margin-top: var(--rpt-spacing);
+                        &.overlay-tip {
+                            margin-top: 0;
+                            font-size: 12px;
+                            color: var(--rpt-muted);
+                        }
+                    }
+                }
+            }
+        }
+
+        button.round-btn {
+            margin: 0 var(--rpt-spacing);
+        }
+
+        button.pager {
+            all: unset;
+            margin: 0 var(--rpt-spacing);
+            min-height: 8px;
+            min-width: 8px;
+            border-radius: 8px;
+            transition-duration: 200ms;
+            transition-timing-function: ease-in-out;
+            font-size: 0;
+            background-color: var(--rpt-pine);
+            &:checked {
+                background-color: var(--rpt-rose);
+            }
+        }
+    }
+}
