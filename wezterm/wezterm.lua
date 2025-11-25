@@ -6,7 +6,11 @@ return {
     keys = require('keys'),
     colors = theme.colors(),
     window_frame = theme.window_frame(),
-    font = wezterm.font 'Maple Mono NF CN',
+    -- font = wezterm.font 'Twitter Color Emoji',
+    font = wezterm.font_with_fallback {
+        'Maple Mono NF CN',
+        'Twitter Color Emoji',
+    },
     font_size = 12.5,
     default_cursor_style = 'BlinkingBlock',
 

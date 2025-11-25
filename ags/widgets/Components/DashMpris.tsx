@@ -235,6 +235,7 @@ export default function DashMpris() {
                 iconName={p.entry ?? "emoji-symbols-symbolic"}
                 onClicked={(self) => {
                   stack.set_visible_child_name(p.busName);
+                  console.log(p.entry);
                   self.active = stack.get_visible_child_name() === p.busName;
                 }}
               />

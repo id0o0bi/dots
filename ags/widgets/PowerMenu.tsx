@@ -20,12 +20,14 @@ export default function PowerMenu() {
   let actTimer: Timer;
 
   const [act, setAct] = createState("");
+  const [tag, setTag] = createState("");
   const [cnt, setCnt] = createState(0);
 
   act.subscribe(() => {
     let action = actions[act.get()] ?? null;
     if (!action) return clearAll();
 
+    setTag(action[0]);
     setCnt(waitSecond);
     actTicker = interval(1000, () => {
       console.log("tick:", cnt.get());
@@ -80,14 +82,13 @@ export default function PowerMenu() {
               orientation={VERTICAL}
               visible={act((a) => a.length > 0)}
             >
-              <Gtk.Label
-                label={act((a) => `确定要 ${actions[a]?.[0] ?? ""} 吗`)}
-              />
+              <Gtk.Label label={tag((n) => `确定要 ${n} 吗`)} />
               <Gtk.Box orientation={HORIZONTAL} halign={CENTER}>
                 <Gtk.Button onClicked={() => setAct("")} label="取消" />
                 <Gtk.Button
+                  class="error"
                   onClicked={() => actNow()}
-                  label={cnt((c) => `确定 ${c.toString()}s`)}
+                  label={cnt((c) => `${tag.get()} ${c.toString()}s`)}
                 />
               </Gtk.Box>
             </Gtk.Box>

@@ -7,8 +7,10 @@ import Gio from "gi://Gio";
 import { execAsync, Process, subprocess } from "ags/process";
 import { getSysUpdate } from "./vendors/ArchUpdate";
 
+const testDark = false;
+
 export function init() {
-  if (!readFile(SCSS_CACHE)) {
+  if (testDark || !readFile(SCSS_CACHE)) {
     console.log("no css cache, creating one...");
     _applyCss();
   }
@@ -91,7 +93,7 @@ async function _applyCss(dark = true, reset = true) {
   const src = `${CONFIG}/styles/main.scss`;
   const dst = SCSS_CACHE;
 
-  // dark = true;
+  if (testDark) dark = true;
 
   let subs = dark ? "moon" : "dawn";
   let scss = `${CONFIG}/styles/colors.scss`;
