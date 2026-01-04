@@ -2,7 +2,7 @@
 
 $blur: 0.3;
 
-$theme-prefer: "moon";
+$theme-prefer: "dawn";
 $theme-colors: (
     "dawn": (
         "base_blur": color.adjust(#faf4ed, $alpha: -$blur),

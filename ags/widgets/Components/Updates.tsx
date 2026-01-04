@@ -14,7 +14,7 @@ import {
 
 export const [update, setUpdates] = createState<Array<ArchUpdate>>([]);
 // setInterval(getSysUpdate, 10000); // 10s for debug
-setInterval(getSysUpdate, 1800000); // 30mins for use
+setInterval(getSysUpdate, 10800000); // 3hour for use
 
 const CMD = ["/home/derren/.local/bin/archupdate.sh"];
 
