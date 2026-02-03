@@ -4,15 +4,14 @@ import GLib from "gi://GLib";
 
 export function sh(cmd: string[]) {
   try {
-    let res = exec(["sh", "-c", ...cmd]);
-    return res;
-  } catch (e) {}
+    return exec(["sh", "-c", cmd.join(' ')]);
+  } catch (e) {console.error(e)}
   return "";
 }
 
 export function shAsync(cmd: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
-    execAsync(["sh", "-c", ...cmd])
+    execAsync(["sh", "-c", cmd.join(' ')])
       .then((res) => {
         resolve(res);
       })

@@ -28,6 +28,12 @@ const { NONE, UNSUPPORTED, TRACK, PLAYLIST } = AstalMpris.Loop;
 let mpris = AstalMpris.get_default();
 let stack: Gtk.Stack;
 
+const getPlayerIcon = (player: AstalMpris.Player) => {
+  const regex = /(?:^org\.mpris\.MediaPlayer2\.)([^.]+)/;
+  let appName = player.busName.match(regex);
+  return appName ? appName[1] : 'emoji-symbols-symbolic';
+};
+
 const Player = (p: AstalMpris.Player): Gtk.Box => {
   const CoverArt = () => (
     <Adw.Avatar
@@ -42,7 +48,6 @@ const Player = (p: AstalMpris.Player): Gtk.Box => {
 
   const MusicTitle = () => (
     <Gtk.Inscription
-      css="font-family: var(--rpt-font-family);"
       text={createBinding(p, "title")}
       valign={CENTER}
       vexpand
@@ -53,7 +58,6 @@ const Player = (p: AstalMpris.Player): Gtk.Box => {
 
   const MusicAlbum = () => (
     <Gtk.Inscription
-      css="font-family: var(--rpt-font-family);"
       text={createBinding(p, "album")}
       sensitive={false}
       wrapMode={Pango.WrapMode.NONE}
@@ -66,7 +70,6 @@ const Player = (p: AstalMpris.Player): Gtk.Box => {
 
   const MusicArtist = () => (
     <Gtk.Inscription
-      css="font-family: var(--rpt-font-family);"
       text={createBinding(p, "artist").as((a) => (a ? a : ""))}
       sensitive={false}
       wrapMode={Pango.WrapMode.NONE}
@@ -232,10 +235,10 @@ export default function DashMpris() {
                   stack,
                   "visibleChildName",
                 )((n) => n == p.busName)}
-                iconName={p.entry ?? "emoji-symbols-symbolic"}
+                iconName={getPlayerIcon(p)}
                 onClicked={(self) => {
                   stack.set_visible_child_name(p.busName);
-                  console.log(p.entry);
+                  // console.log(p.busName);
                   self.active = stack.get_visible_child_name() === p.busName;
                 }}
               />

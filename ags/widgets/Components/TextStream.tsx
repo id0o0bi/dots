@@ -1,5 +1,5 @@
 import { Gtk } from "ags/gtk4";
-import { BASELINE_CENTER, lineStr, streamProc } from "../../services/vars";
+import { asrText, BASELINE_CENTER, lineStr } from "../../services/vars";
 import Pango from "gi://Pango";
 
 export default function TextStream() {
@@ -18,17 +18,6 @@ export default function TextStream() {
         wrapMode={Pango.WrapMode.NONE}
         sensitive={false}
         textOverflow={Gtk.InscriptionOverflow.ELLIPSIZE_START}
-      />
-      {/*<Gtk.Button class="unset" iconName="object-flip-horizontal-symbolic" />*/}
-      {/*<Gtk.Image file={`${ASSETS}/sound.gif`} />*/}
-      <Gtk.Button
-        class="unset"
-        iconName="media-playback-stop-symbolic"
-        tooltipText="Terminate Process"
-        onClicked={() => {
-          // console.log(streamProc);
-          streamProc.signal(2);
-        }}
       />
     </Gtk.Box>
   );

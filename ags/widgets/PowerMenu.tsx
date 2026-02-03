@@ -17,40 +17,47 @@ export default function PowerMenu() {
   const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor;
   let win: Astal.Window;
   let actTicker: Timer;
-  let actTimer: Timer;
 
   const [act, setAct] = createState("");
   const [tag, setTag] = createState("");
   const [cnt, setCnt] = createState(0);
 
+  // action button pressed
   act.subscribe(() => {
     let action = actions[act.get()] ?? null;
-    if (!action) return clearAll();
+    if (!action) return clearTicker();
 
     setTag(action[0]);
     setCnt(waitSecond);
     actTicker = interval(1000, () => {
-      console.log("tick:", cnt.get());
       let next = cnt.get() - 1;
-      if (next >= 0) setCnt(next);
-      else actTicker.cancel();
-    });
-
-    actTimer = timeout(waitSecond * 1000, () => {
-      actTicker.cancel();
-      sh([action[2]]);
+      next >= 0 ? setCnt(next) : actTicker.cancel();
     });
   });
 
-  function clearAll() {
+  // action countdown expired
+  cnt.subscribe(() => {
+    if (cnt.get() !== 0) return;
+    let action = actions[act.get()] ?? null;
+    if (!action) return;
+
+    doAction();
+  });
+
+  // clear action countdown
+  function clearTicker() {
     if (actTicker) actTicker.cancel();
-    if (actTimer) actTimer.cancel();
   }
 
-  function actNow(): void {
-    clearAll();
+  // action button pressed or countdown expired
+  function doAction() {
+    let cmd = actions[act.get()][2] ?? null;
+    if (!cmd) return false;
+
     win.visible = false;
-    sh([actions[act.get()][2]]);
+    setAct("");
+    clearTicker();
+    setTimeout(() => { sh([cmd]); }, 300);
   }
 
   function onKey(_e: Gtk.EventControllerKey, keyval: number) {
@@ -87,7 +94,7 @@ export default function PowerMenu() {
                 <Gtk.Button onClicked={() => setAct("")} label="取消" />
                 <Gtk.Button
                   class="error"
-                  onClicked={() => actNow()}
+                  onClicked={() => setCnt(0)}
                   label={cnt((c) => `${tag.get()} ${c.toString()}s`)}
                 />
               </Gtk.Box>

@@ -4,7 +4,7 @@ import { WeatherData } from "../type";
 import { shAsync } from "../util";
 import { setWeather } from "../../widgets/Components/Weather";
 
-const CMD = "curl -m 10 wttr.in/?format=j1 2>/dev/null";
+const CMD = "curl -m 10 wttr.in/?format=j1 &>/dev/null";
 
 export function getFromWttrIn(): void {
   try {

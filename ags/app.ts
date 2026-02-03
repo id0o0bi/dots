@@ -5,6 +5,7 @@ import Bar from "./widgets/Bar";
 import Launcher from "./widgets/Launcher";
 import PowerMenu from "./widgets/PowerMenu";
 import OSD from "./widgets/OSD";
+import ASR from "./widgets/ASR";
 import { Popups } from "./widgets/Components/Notification";
 
 app.start({
@@ -16,6 +17,7 @@ app.start({
     Launcher();
     PowerMenu();
     OSD();
+    ASR();
   },
   requestHandler(args: string[], res: (res: any) => void) {
     return res(args[0] == "func" ? cli(args[1]) : "unknown command");

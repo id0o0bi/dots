@@ -85,15 +85,18 @@ window#bar {
 
             box.textStream {
                 /* background-color: var(--rpt-surface); */
-                border-radius: var(--rpt-round);
+                /* border-radius: var(--rpt-round); */
                 padding: 0 var(--rpt-spacing);
                 margin: 2px var(--rpt-spacing);
                 font-size: 14px;
                 label {
                     min-height: 20px;
                 }
-                button {
-                    margin-left: var(--rpt-spacing);
+            }
+
+            box.tools-box {
+                button.stop {
+                    margin-right: var(--rpt-spacing);
                     color: var(--rpt-muted);
                     &:hover {
                         color: var(--rpt-text);

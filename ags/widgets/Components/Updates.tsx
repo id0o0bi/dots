@@ -8,6 +8,7 @@ import {
   END,
   HORIZONTAL,
   SEC_PKGS,
+  setLineStr,
   START,
   VERTICAL,
 } from "../../services/vars";
@@ -50,7 +51,7 @@ export function UpdateIcon() {
                 iconName="folder-download-symbolic"
                 class="round-btn"
                 tooltipText="Update"
-                onClicked={() => cmdOutBufStream(CMD, "sys-update", true)}
+                onClicked={() => cmdOutBufStream(CMD, "sys-update", setLineStr)}
               />
             </Gtk.Box>
           </Gtk.Box>

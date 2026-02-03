@@ -3,14 +3,17 @@ import { Gtk } from "ags/gtk4";
 import { Process } from "ags/process";
 import { createPoll } from "ags/time";
 import GLib from "gi://GLib";
+import { debounce } from "./util";
 
 export const { HORIZONTAL, VERTICAL } = Gtk.Orientation;
 export const { CENTER, START, END, BASELINE_CENTER } = Gtk.Align;
 
 export const [lineStr, setLineStr] = createState("");
+export const [asrText, setAsrText] = createState("");
 
-export var streamProc: Process;
-export const setStreamProc = (proc: Process) => (streamProc = proc);
+export const [streamProc, setStreamProc] = createState<Process|null>(null);
+
+export const delayeSetLineStr = debounce(setLineStr, 300);
 
 export const TXTBUF = new Gtk.TextBuffer();
 export const DTTIME = createPoll(

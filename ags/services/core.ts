@@ -1,11 +1,12 @@
 import app from "ags/gtk4/app";
-import { sh } from "./util";
-import { _CACHE, CONFIG, SCSS_CACHE, setLineStr } from "./vars";
+import { sh, shAsync } from "./util";
+import { _CACHE, CONFIG, SCSS_CACHE } from "./vars";
 import { monitorFile, readFile, writeFileAsync } from "ags/file";
 import { isNight } from "../widgets/Components/Weather";
 import Gio from "gi://Gio";
-import { execAsync, Process, subprocess } from "ags/process";
+import { Process, subprocess } from "ags/process";
 import { getSysUpdate } from "./vendors/ArchUpdate";
+import AstalBattery from "gi://AstalBattery?version=0.1";
 
 const testDark = false;
 
@@ -29,8 +30,11 @@ export function init() {
     _applyCss(isNight.get());
   });
 
+  // batery monitor
+  _batteryMonitor();
+
   // clean up cache files over 7 days
-  execAsync(`find ${_CACHE}/procs/ -type f -mtime +3 -delete`);
+  shAsync([`find ${_CACHE}/procs/ -type f -mtime +3 -delete`]).catch(console.error);
 }
 
 /**
@@ -43,7 +47,7 @@ export function init() {
 export function cmdOutBufStream(
   command: string[],
   logName: string,
-  appendToTextBuffer: boolean,
+  appendFunc?: Function,
 ): Process {
   let dTime = new Date().toISOString().replace(/[^\d]/g, "");
   let sRand = Math.random().toString(36).substring(2, 6);
@@ -56,11 +60,11 @@ export function cmdOutBufStream(
     command,
     (out) => {
       outStr += out + "\n";
-      appendToTextBuffer && setLineStr(out);
+      appendFunc?.apply(null, [out.replace(/^Recogniz.*?: ?/, '')]);
     },
     (err) => {
       errStr += err + "\n";
-      appendToTextBuffer && setLineStr(`<span color="red">${err}</span>`);
+      appendFunc?.apply(null, [`<span color="red">${err.replace(/^Recogniz.*?: ?/, '')}</span>`]);
     },
   );
 
@@ -68,11 +72,7 @@ export function cmdOutBufStream(
     writeFileAsync(`${fName}.out`, outStr);
     writeFileAsync(`${fName}.err`, errStr);
     // notify user with action: Open stdOut, Open stdErr
-    if (appendToTextBuffer) {
-      // timeout(2000, () => TXTBUF.set_text("", -1));
-      // timeout(2000, () => setLineStr(""));
-      setLineStr("");
-    }
+    appendFunc?.apply(null, ['']);
   });
 
   return proc;
@@ -105,4 +105,26 @@ async function _applyCss(dark = true, reset = true) {
 
   const settings = new Gio.Settings({ schema: "org.gnome.desktop.interface" });
   settings.set_string("color-scheme", `prefer-${dark ? "dark" : "light"}`);
+}
+
+async function _batteryMonitor() {
+  const battery = AstalBattery.get_default();
+
+  // let percent = battery.percentage * 100;
+  // let usi = percent <= 15
+  //   // [title, urgency, summary, icon]
+  //   ? ['critical', `'Battery Empty!'`, 'battery-caution']
+  //   : ['normal', `'Battery Low!'`, 'battery-low'];
+  // shAsync(['notify-send', `'Battery: ${percent}%'`, usi[1], '-i', usi[2], '-u', usi[0]]).catch(console.error);
+
+  battery.connect("notify::percentage", () => {
+    let percent = battery.percentage * 100;
+    if (!battery.get_charging() && percent in [5, 15, 30]) {
+      let usi = percent <= 15
+        // [urgency, summary, icon]
+        ? ['critical', `'Battery Empty!'`, 'battery-caution']
+        : ['normal', `'Battery Low!'`, 'battery-low'];
+      shAsync(['notify-send', `'Battery: ${percent}%'`, usi[1], '-i', usi[2], '-u', usi[0]]).catch(console.error);
+    }
+  });
 }
