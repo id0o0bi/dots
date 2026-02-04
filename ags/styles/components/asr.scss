@@ -9,10 +9,10 @@ window#asr {
     label {
         color: var(--rpt-text);
         text-shadow:
-            -2px -2px 0 var(--rpt-base),
-             2px -2px 0 var(--rpt-base),
-            -2px  2px 0 var(--rpt-base),
-             2px  2px 0 var(--rpt-base);
+            -2px -2px 2px var(--rpt-base),
+             2px -2px 2px var(--rpt-base),
+            -2px  2px 2px var(--rpt-base),
+             2px  2px 2px var(--rpt-base);
         font-size: 48px;
         font-family: 'LXGW WenKai';
     }

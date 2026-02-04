@@ -6,6 +6,10 @@ import { debounce, sh, shAsync } from "../services/util";
 import { monitorFile } from "ags/file";
 import { VERTICAL } from "../services/vars";
 
+// this is used to supress the start up notification
+// [speaker mute, microphone mute, volume]
+let prestine = [true, true, true];
+
 const { defaultSpeaker: speaker, defaultMicrophone: microphone } =
   AstalWp.get_default()!;
 
@@ -28,19 +32,19 @@ export default function OSD() {
   speaker.connect("notify::mute", (e) => {
     setOsdIcon(e.get_volume_icon());
     setOsdText(e.get_mute() ? "Muted" : "");
-    showOSD();
+    prestine[0] ? prestine[0] = false : showOSD();
   });
 
   microphone.connect("notify::mute", (e) => {
     setOsdIcon(e.get_volume_icon());
     setOsdText(e.get_mute() ? "Muted" : "");
-    showOSD();
+    prestine[1] ? prestine[1] = false : showOSD();
   });
 
   speaker.connect("notify::volume", (e) => {
     setOsdIcon(e.get_volume_icon());
     setOsdText(`${Math.round(e.get_volume() * 100)}%`);
-    showOSD();
+    prestine[2] ? prestine[2] = false : showOSD();
   });
 
   monitorFile(`${dir}/${scr}/brightness`, (f) => {
