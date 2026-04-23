@@ -60,11 +60,11 @@ export function cmdOutBufStream(
     command,
     (out) => {
       outStr += out + "\n";
-      appendFunc?.apply(null, [out.replace(/^Recogniz.*?: ?/, '')]);
+      appendFunc?.apply(null, [out]);
     },
     (err) => {
       errStr += err + "\n";
-      appendFunc?.apply(null, [`<span color="red">${err.replace(/^Recogniz.*?: ?/, '')}</span>`]);
+      // appendFunc?.apply(null, [`<span color="red">${err.replace(/^Recogniz.*?: ?/, '')}</span>`]);
     },
   );
 
@@ -72,6 +72,8 @@ export function cmdOutBufStream(
     writeFileAsync(`${fName}.out`, outStr);
     writeFileAsync(`${fName}.err`, errStr);
     // notify user with action: Open stdOut, Open stdErr
+    outStr = "";
+    errStr = "";
     appendFunc?.apply(null, ['']);
   });
 
@@ -110,16 +112,18 @@ async function _applyCss(dark = true, reset = true) {
 async function _batteryMonitor() {
   const battery = AstalBattery.get_default();
 
-  // let percent = battery.percentage * 100;
-  // let usi = percent <= 15
-  //   // [title, urgency, summary, icon]
-  //   ? ['critical', `'Battery Empty!'`, 'battery-caution']
-  //   : ['normal', `'Battery Low!'`, 'battery-low'];
-  // shAsync(['notify-send', `'Battery: ${percent}%'`, usi[1], '-i', usi[2], '-u', usi[0]]).catch(console.error);
+  // let percent = Math.floor(battery.percentage * 100);
+  // if (!battery.get_charging() && [5, 15, 30].includes(percent)) {
+  //   let usi = percent <= 15
+  //     // [urgency, summary, icon]
+  //     ? ['critical', `'Battery Empty!'`, 'battery-caution']
+  //     : ['normal', `'Battery Low!'`, 'battery-low'];
+  //   shAsync(['notify-send', `'Battery: ${percent}%'`, usi[1], '-i', usi[2], '-u', usi[0]]).catch(console.error);
+  // }
 
   battery.connect("notify::percentage", () => {
-    let percent = battery.percentage * 100;
-    if (!battery.get_charging() && percent in [5, 15, 30]) {
+    let percent = Math.floor(battery.percentage * 100);
+    if (!battery.get_charging() && [5, 15, 30].includes(percent)) {
       let usi = percent <= 15
         // [urgency, summary, icon]
         ? ['critical', `'Battery Empty!'`, 'battery-caution']

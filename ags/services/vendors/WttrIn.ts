@@ -4,21 +4,13 @@ import { WeatherData } from "../type";
 import { shAsync } from "../util";
 import { setWeather } from "../../widgets/Components/Weather";
 
-const CMD = "curl -m 10 wttr.in/?format=j1 &>/dev/null";
+const CMD = `curl -m 10 wttr.in/?format=j1 > ${WTTR_CACHE} 2>/dev/null`;
 
 export function getFromWttrIn(): void {
   try {
-    shAsync([CMD])
-      .then((out) => {
-        out = out.trim();
-        if (out === "") return;
-        setWeather(_convWttrData(JSON.parse(out)));
-        writeFileAsync(WTTR_CACHE, out);
-      })
-      .catch((e) => {
-        console.log(e);
-        throw new Error(e);
-      });
+    shAsync(CMD.split(' '))
+      .then(_ => setWeather(getFromCache()))
+      .catch(console.error);
   } catch (e) {
     console.error("failed", e);
   }

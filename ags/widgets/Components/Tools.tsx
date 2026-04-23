@@ -23,7 +23,7 @@ export function ToolsIcon() {
         visible={streamProc.as(s => s !== null)}
         tooltipText="Terminate Process"
         onClicked={() => {
-          streamProc.get()?.signal(2);
+          streamProc.peek()?.kill();
           setStreamProc(null);
         }}
       />
@@ -44,7 +44,10 @@ export function ToolsIcon() {
                 sensitive={lineStr.as((s) => s.length == 0)}
                 iconName="audio-headphones-symbolic"
                 onClicked={() => {
-                  setStreamProc(cmdOutBufStream(CMD_ASRALSA, "asr-alsa", setAsrText));
+                  // setStreamProc(cmdOutBufStream(CMD_ASRALSA, "asr-alsa", setAsrText));
+                  let p = cmdOutBufStream(CMD_ASRALSA, "asr-alsa", setAsrText);
+                  console.log(p);
+                  setStreamProc(p);
                 }}
               />
               <Gtk.Button

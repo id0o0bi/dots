@@ -7,13 +7,13 @@ window#asr {
     }
 
     label {
-        color: var(--rpt-text);
+        color: var(--rpt-base);
         text-shadow:
-            -2px -2px 2px var(--rpt-base),
-             2px -2px 2px var(--rpt-base),
-            -2px  2px 2px var(--rpt-base),
-             2px  2px 2px var(--rpt-base);
-        font-size: 48px;
+            -1px -1px 6px var(--rpt-text),
+             1px -1px 6px var(--rpt-text),
+            -1px  1px 6px var(--rpt-text),
+             1px  1px 6px var(--rpt-text);
+        font-size: 36px;
         font-family: 'LXGW WenKai';
     }
 }

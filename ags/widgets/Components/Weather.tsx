@@ -46,19 +46,18 @@ const hourDetail = createComputed([weather], (weather) => {
 });
 
 const nowDetail = createComputed([weather], (weather) =>
-  _getNowWeatherItem(weather),
+  _getNowWeatherItem(weather) ?? {},
 );
 
 // get if now is night time, computed from sunrise/sunset data
 export const isNight = createComputed([weather], (w) => {
-  let night = true;
   let time = sh(["date +'%H:%M'"]);
-  let item = _getNowWeatherItem(w);
+  let item = _getNowWeatherItem(w) ?? {};
   if (item && item.date)
-    night = time < to24HM(item.sunrise) || time > to24HM(item.sunset);
+    return time < to24HM(item.sunrise) || time > to24HM(item.sunset);
 
   // console.log(item.sunrise, night);
-  return night;
+  return time < "06:30" || time > "18:30";
 });
 
 const rewriteTime = (timeStr: string): string => {
