@@ -18,19 +18,20 @@ export const [update, setUpdates] = createState<Array<ArchUpdate>>([]);
 setInterval(getSysUpdate, 10800000); // 3hour for use
 
 const CMD = ["/home/derren/.local/bin/archupdate.sh"];
+const [updating, setUpdating] = createState(false);
 
 export function UpdateIcon() {
   // software-update-available-symbolic, software-update-urgent-symbolic
-  let icon = createComputed([update], (u) => {
-    if (u.length < 1) return "";
-    let urgent = u.find((i) => SEC_PKGS.includes(i.package));
+  let icon = createComputed(() => {
+    if (update().length < 1) return "";
+    let urgent = update().find((i) => SEC_PKGS.includes(i.package));
     return urgent
       ? "software-update-urgent-symbolic"
       : "software-update-available-symbolic";
   });
 
   return (
-    <Gtk.MenuButton class="unset" visible={icon((i) => i.length > 0)}>
+    <Gtk.MenuButton class="unset" visible={icon().length > 0}>
       <Gtk.Image
         iconName={icon}
         tooltipText={update((u) => `${u.length} updates`)}
@@ -50,8 +51,12 @@ export function UpdateIcon() {
               <Gtk.Button
                 iconName="folder-download-symbolic"
                 class="round-btn"
+                sensitive={!updating()}
                 tooltipText="Update"
-                onClicked={() => cmdOutBufStream(CMD, "sys-update", setLineStr)}
+                onClicked={() => {
+                  cmdOutBufStream(CMD, "sys-update", setLineStr);
+                  setUpdating(true);
+                }}
               />
             </Gtk.Box>
           </Gtk.Box>

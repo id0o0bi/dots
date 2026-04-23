@@ -98,7 +98,7 @@ export const Popups = () => {
 
     const pop = notifd.get_notification(id);
     // console.log(pop.summary);
-    if (replaced && pops.get().some((n) => n.id === id)) {
+    if (replaced && pops().some((n) => n.id === id)) {
       setPops((ns) => ns.map((n) => (n.id === id ? pop : n)));
     } else {
       setPops((ns) => [pop, ...ns]);

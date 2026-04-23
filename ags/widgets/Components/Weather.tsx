@@ -31,12 +31,12 @@ export const [weather, setWeather] = createState<WeatherData>(getFromCache());
 setInterval(getFromWttrIn, 1800000); // 30mins for use
 
 // 分时天气信息：近18(6✖️3)小时内天气信息, 可能跨天
-const hourDetail = createComputed([weather], (weather) => {
+const hourDetail = createComputed(() => {
   let time = sh(["date +'%Y-%m-%d %H:%M'"]);
   let list: Array<WeatherItem> = [];
   let [date, hour] = time.split(" ");
 
-  weather.forcast?.forEach((f) => {
+  weather().forcast?.forEach((f) => {
     if (f.date < date) return;
     if (f.date == date && f.hour < parseInt(hour.slice(0, 2))) return;
     if (list.length < 6) list.push(f);
@@ -45,14 +45,14 @@ const hourDetail = createComputed([weather], (weather) => {
   return list;
 });
 
-const nowDetail = createComputed([weather], (weather) =>
-  _getNowWeatherItem(weather) ?? {},
+const nowDetail = createComputed(() =>
+  _getNowWeatherItem(weather()) ?? {},
 );
 
 // get if now is night time, computed from sunrise/sunset data
-export const isNight = createComputed([weather], (w) => {
+export const isNight = createComputed(() => {
   let time = sh(["date +'%H:%M'"]);
-  let item = _getNowWeatherItem(w) ?? {};
+  let item = _getNowWeatherItem(weather()) ?? {};
   if (item && item.date)
     return time < to24HM(item.sunrise) || time > to24HM(item.sunset);
 
@@ -64,7 +64,7 @@ const rewriteTime = (timeStr: string): string => {
   const match = timeStr.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2} [APM]{2})/);
 
   if (!match) return timeStr; // Return original if format doesn't match
-  const [_, year, month, day, time] = match;
+  const [_, y, month, day, time] = match;
 
   return `${to24HM(time)} ${day}/${month}`;
 };

@@ -16,9 +16,9 @@ const _map = [
 ];
 
 const getGridCube = (col: number, row: number, seq: number): Gtk.Label => {
-  let cls = createComputed([DTTIME], (d) => {
+  let cls = createComputed(() => {
     let tmp = [] as Array<string>;
-    let tStr = d.slice(11, 19).split(":");
+    let tStr = DTTIME().slice(11, 19).split(":");
     let hh = tStr[0];
     let mm = tStr[1];
     let ss = tStr[2];

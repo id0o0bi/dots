@@ -19,17 +19,17 @@ export default function Launcher() {
   const [page, setPage] = createState(1);
   const [data, setData] = createState(apps.get_list());
 
-  const pages = createComputed([data], () =>
+  const pages = createComputed(() =>
     Array.from(
-      { length: Math.ceil(data.get().length / (cols * rows)) },
+      { length: Math.ceil(data().length / (cols * rows)) },
       (_, i) => i + 1,
     ),
   );
 
-  const pageData = createComputed([page, data], (p, d) => {
-    // sort apps, clean FlowBox, rerender list
+  // sort apps, clean FlowBox, rerender list
+  const pageData = createComputed(() => {
+    let [p, d] = [page(), data()];
     d.sort((a, b) => b.frequency - a.frequency);
-    flowbox?.remove_all();
     return d.slice((p - 1) * cols * rows, p * cols * rows);
   });
 
@@ -66,17 +66,17 @@ export default function Launcher() {
 
     for (const i of [1, 2, 3, 4, 5, 6, 7, 8, 9] as const) {
       if (keyval === Gdk[`KEY_${i}`]) {
-        return launch(data.get()[i - 1]);
+        return launch(data()[i - 1]);
       }
     }
 
     if (keyval === Gdk.KEY_Left) {
-      if (page.get() > 1) setPage(page.get() - 1);
+      if (page() > 1) setPage(page() - 1);
       return;
     }
 
     if (keyval === Gdk.KEY_Right) {
-      if (page.get() + 1 <= (pages.get().at(-1) ?? 1)) setPage(page.get() + 1);
+      if (page() + 1 <= (pages().at(-1) ?? 1)) setPage(page() + 1);
       return;
     }
   }
@@ -154,7 +154,7 @@ export default function Launcher() {
             valign={CENTER}
             vexpand={false}
             sensitive={page((pg) => pg > 1)}
-            onClicked={() => setPage(page.get() - 1)}
+            onClicked={() => setPage(page() - 1)}
             iconName="go-previous-symbolic"
           />
           <Gtk.Box vexpand={false}>
@@ -174,8 +174,8 @@ export default function Launcher() {
             class="round-btn"
             valign={CENTER}
             vexpand={false}
-            sensitive={page((pg) => pg < pages.get().length)}
-            onClicked={() => setPage(page.get() + 1)}
+            sensitive={page((pg) => pg < pages().length)}
+            onClicked={() => setPage(page() + 1)}
             iconName="go-next-symbolic"
           />
         </Gtk.Box>

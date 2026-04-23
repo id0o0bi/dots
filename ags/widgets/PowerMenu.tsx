@@ -24,21 +24,21 @@ export default function PowerMenu() {
 
   // action button pressed
   act.subscribe(() => {
-    let action = actions[act.get()] ?? null;
+    let action = actions[act.peek()] ?? null;
     if (!action) return clearTicker();
 
     setTag(action[0]);
     setCnt(waitSecond);
     actTicker = interval(1000, () => {
-      let next = cnt.get() - 1;
+      let next = cnt.peek() - 1;
       next >= 0 ? setCnt(next) : actTicker.cancel();
     });
   });
 
   // action countdown expired
   cnt.subscribe(() => {
-    if (cnt.get() !== 0) return;
-    let action = actions[act.get()] ?? null;
+    if (cnt.peek() !== 0) return;
+    let action = actions[act.peek()] ?? null;
     if (!action) return;
 
     doAction();
@@ -51,7 +51,7 @@ export default function PowerMenu() {
 
   // action button pressed or countdown expired
   function doAction() {
-    let cmd = actions[act.get()][2] ?? null;
+    let cmd = actions[act.peek()][2] ?? null;
     if (!cmd) return false;
 
     win.visible = false;
@@ -95,7 +95,7 @@ export default function PowerMenu() {
                 <Gtk.Button
                   class="error"
                   onClicked={() => setCnt(0)}
-                  label={cnt((c) => `${tag.get()} ${c.toString()}s`)}
+                  label={cnt((c) => `${tag.peek()} ${c.toString()}s`)}
                 />
               </Gtk.Box>
             </Gtk.Box>

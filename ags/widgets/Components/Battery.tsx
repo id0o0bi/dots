@@ -14,12 +14,12 @@ export default function Battery() {
   const icon = createBinding(battery, "iconName");
   const uptime = createPoll("", 60000, "uptime");
   const charge = createComputed(
-    [createBinding(battery, "charging"), createBinding(battery, "timeToEmpty")],
-    (c, r) => {
-      if (c) return "󱐋 Charging";
-      return `󱦟 ${formatSeconds(r, "%hhh:%mmm")}`;
+    () => {
+      if (battery.get_charging()) return "󱐋 Charging";
+      return `󱦟 ${formatSeconds(battery.get_time_to_empty(), "%hhh:%mmm")}`;
     },
   );
+
   const percent = createBinding(
     battery,
     "percentage",

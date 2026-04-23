@@ -16,10 +16,10 @@ export function WorkSpaces() {
       {labels.map((label, index) => {
         let idx = index + 1;
         let _ws = wss((p) => p.find((w) => w.name == idx.toString()));
-        let cls = createComputed([fws, _ws], (fws, _ws) => {
+        let cls = createComputed(() => {
           let cls = [];
-          if (_ws?.get_clients()) cls.push("occupied");
-          if (fws.name == idx.toString()) cls.push("focused");
+          if (_ws()?.get_clients()) cls.push("occupied");
+          if (fws().name == idx.toString()) cls.push("focused");
           return cls;
         });
 

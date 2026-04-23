@@ -4,7 +4,6 @@ import AstalTray from "gi://AstalTray";
 
 export default function Tray() {
   const tray = AstalTray.get_default();
-  // const items = ;
 
   const filter = (
     items: Array<AstalTray.TrayItem>,

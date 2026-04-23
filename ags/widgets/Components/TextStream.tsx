@@ -1,5 +1,5 @@
 import { Gtk } from "ags/gtk4";
-import { asrText, BASELINE_CENTER, lineStr } from "../../services/vars";
+import { BASELINE_CENTER, lineStr } from "../../services/vars";
 import Pango from "gi://Pango";
 
 export default function TextStream() {
