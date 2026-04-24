@@ -203,8 +203,6 @@ export default function Launcher() {
       <Gtk.EventControllerScroll flags={Gtk.EventControllerScrollFlags.HORIZONTAL} onScroll={onScroll} />
       <Gtk.CenterBox
         name="launcher-content"
-        hexpand={true}
-        valign={Gtk.Align.START}
         halign={Gtk.Align.CENTER}
         orientation={VERTICAL}
         // homogeneous={true}
@@ -223,6 +221,7 @@ export default function Launcher() {
           <Gtk.FlowBox
             homogeneous
             maxChildrenPerLine={6}
+            valign={Gtk.Align.START}
           >
             <For each={pageData}>
               {(app, index) => (
