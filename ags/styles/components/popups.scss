@@ -73,8 +73,9 @@ window#popups {
         @include notifRow;
         row,
         box.row {
-            background-color: var(--rpt-base-blur);
+            background-color: var(--rpt-base);
             border-color: var(--border-color);
+            box-shadow: 1px 1px 8px var(--rpt-overlay-blur);
         }
     }
 }
