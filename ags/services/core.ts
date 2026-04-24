@@ -20,6 +20,7 @@ export function init() {
   monitorFile(`${CONFIG}/styles/components/`, () => {
     _compileScss();
     app.apply_css(SCSS_CACHE);
+    applyTheme(isNight());
   });
 
   // connect to isNight changes

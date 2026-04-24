@@ -53,7 +53,7 @@ const THEMES: Record<ThemeName, Record<string, string>> = {
 function toCssVars(theme: ThemeName): string {
   const t = THEMES[theme];
   const vars = Object.entries(t)
-    .map(([key, val]) => `  --rpt-${key}: ${val};`)
+    .map(([key, val]) => `  --rpt-${key.replace('_', '-')}: ${val};`)
     .join("\n");
   return `:root {\n${vars}\n}\n`;
 }
