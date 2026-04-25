@@ -22,13 +22,50 @@ export default function Volume() {
       });
   };
 
+  /** Raw Gtk.Scale with manual two-way binding to avoid Astal.Slider bugs */
+  const VolumeScale = ({ endpoint }: { endpoint: AstalWp.Endpoint }) => {
+    const adj = new Gtk.Adjustment({
+      value: Math.min(endpoint.volume, 1),
+      lower: 0,
+      upper: 1,
+      step_increment: 0.05,
+      page_increment: 0.1,
+      page_size: 0,
+    });
+
+    const scale = new Gtk.Scale({
+      orientation: Gtk.Orientation.HORIZONTAL,
+      adjustment: adj,
+      hexpand: true,
+    });
+
+    // slider → endpoint
+    scale.connect("value-changed", () => {
+      endpoint.set_volume(Math.min(adj.get_value(), 1));
+    });
+
+    // endpoint → slider (guard against feedback loop)
+    let updating = false;
+    endpoint.connect("notify::volume", () => {
+      if (updating) return;
+      const capped = Math.min(endpoint.volume, 1);
+      if (Math.abs(adj.get_value() - capped) > 0.001) {
+        updating = true;
+        adj.set_value(capped);
+        updating = false;
+      }
+    });
+
+    return scale;
+  };
+
   return (
     <Gtk.MenuButton
       class="unset"
       tooltipText={createBinding(
         speaker,
         "volume",
-      )((v) => `${Math.floor(v * 100)}%`)}
+      )((v) => `${Math.floor(Math.min(v, 1) * 100)}%`)}
     >
       <Gtk.Image iconName={createBinding(speaker, "volumeIcon")} />
       <Gtk.Popover hasArrow={false}>
@@ -39,13 +76,7 @@ export default function Volume() {
               iconName={createBinding(speaker, "volumeIcon")}
               onClicked={() => speaker.set_mute(!speaker.mute)}
             />
-            <slider
-              hexpand={true}
-              onChangeValue={({ value }) => {
-                speaker.set_volume(value);
-              }}
-              value={createBinding(speaker, "volume")}
-            />
+            <VolumeScale endpoint={speaker} />
           </Gtk.Box>
           <Gtk.Box class="control" orientation={HORIZONTAL}>
             <Gtk.Button
@@ -53,13 +84,7 @@ export default function Volume() {
               iconName={createBinding(microphone, "volumeIcon")}
               onClicked={() => microphone.set_mute(!microphone.mute)}
             />
-            <slider
-              hexpand={true}
-              onChangeValue={({ value }) => {
-                microphone.set_volume(value);
-              }}
-              value={createBinding(microphone, "volume")}
-            />
+            <VolumeScale endpoint={microphone} />
           </Gtk.Box>
           <Gtk.Separator css="margin-bottom: 8px;" />
           <Gtk.Box class="linked vertical" orientation={VERTICAL}>
