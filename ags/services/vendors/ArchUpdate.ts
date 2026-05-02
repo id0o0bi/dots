@@ -1,6 +1,6 @@
 import { shAsync } from "../util";
-import { setUpdates } from "../../widgets/Components/Updates";
 import { ArchUpdate } from "../type";
+import { setUpdates } from "../vars";
 
 export async function getSysUpdate(): Promise<void> {
   shAsync(["checkupdates"])

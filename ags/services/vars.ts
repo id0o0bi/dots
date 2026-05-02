@@ -4,6 +4,7 @@ import { Process } from "ags/process";
 import { createPoll } from "ags/time";
 import GLib from "gi://GLib";
 import { debounce } from "./util";
+import { ArchUpdate } from "./type";
 
 export const { HORIZONTAL, VERTICAL } = Gtk.Orientation;
 export const { CENTER, START, END, BASELINE_CENTER } = Gtk.Align;
@@ -12,6 +13,8 @@ export const [lineStr, setLineStr] = createState("");
 export const [asrText, setAsrText] = createState("");
 
 export const [streamProc, setStreamProc] = createState<Process|null>(null);
+
+export const [update, setUpdates] = createState<Array<ArchUpdate>>([]);
 
 export const delayeSetLineStr = debounce(setLineStr, 300);
 

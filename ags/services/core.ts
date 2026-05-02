@@ -7,6 +7,7 @@ import { Process, subprocess } from "ags/process";
 import { getSysUpdate } from "./vendors/ArchUpdate";
 import AstalBattery from "gi://AstalBattery?version=0.1";
 import { applyTheme } from "./themes";
+import { setUpdating } from "../widgets/Components/Updates";
 
 export function init() {
   // compile scss once on startup (generates the base CSS with structural styles)
@@ -72,6 +73,7 @@ export function cli(req: string) {
   switch (req) {
     case "sysUpdate":
       getSysUpdate();
+      setUpdating(false);
       break;
     default:
       console.log("Invalid command");

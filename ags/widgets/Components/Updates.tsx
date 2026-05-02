@@ -1,6 +1,5 @@
 import { createComputed, createState, For } from "ags";
 import { Gtk } from "ags/gtk4";
-import { ArchUpdate } from "../../services/type";
 import { getSysUpdate } from "../../services/vendors/ArchUpdate";
 import { cmdOutBufStream } from "../../services/core";
 import {
@@ -10,15 +9,15 @@ import {
   SEC_PKGS,
   setLineStr,
   START,
+  update,
   VERTICAL,
 } from "../../services/vars";
 
-export const [update, setUpdates] = createState<Array<ArchUpdate>>([]);
 // setInterval(getSysUpdate, 10000); // 10s for debug
 setInterval(getSysUpdate, 10800000); // 3hour for use
 
+export const [updating, setUpdating] = createState(false);
 const CMD = ["/home/derren/.local/bin/archupdate.sh"];
-const [updating, setUpdating] = createState(false);
 
 export function UpdateIcon() {
   // software-update-available-symbolic, software-update-urgent-symbolic
@@ -31,7 +30,7 @@ export function UpdateIcon() {
   });
 
   return (
-    <Gtk.MenuButton class="unset" visible={icon().length > 0}>
+    <Gtk.MenuButton class="unset" visible={icon(i => i.length > 0)}>
       <Gtk.Image
         iconName={icon}
         tooltipText={update((u) => `${u.length} updates`)}
@@ -51,7 +50,7 @@ export function UpdateIcon() {
               <Gtk.Button
                 iconName="folder-download-symbolic"
                 class="round-btn"
-                sensitive={!updating()}
+                sensitive={updating(u => !u)}
                 tooltipText="Update"
                 onClicked={() => {
                   cmdOutBufStream(CMD, "sys-update", setLineStr);
