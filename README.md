@@ -8,41 +8,39 @@ A personalized dotfiles collection featuring a Wayland workflow built around [Hy
 <details>
 <summary>Click to show/hide screenshot 📸</summary>
 
-<img src="./ags/assets/screenshot.jpeg" alt="Desktop screenshot" align="right" width="450px">
+<div align="center">
+  <img src="./ags/assets/screenshot.jpeg" alt="Screenshot" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);margin-top: 12px;">
+</div>
 
 </details>
 
 # Components
 
-- **WM**        : [Hyprland](https://github.com/hyprwm/Hyprland) :art: WM for Wayland
-- **Colors**    : [Rosé Pine](https://rosepinetheme.com/) :rainbow: Something beautiful
-- **Shell**     : [fish](https://fishshell.com/) :fish: Finally, a command line shell for the 90s
-- **Terminal**  : [wezterm](https://wezterm.org/) :computer: A powerful terminal emulator and multiplexer
-- **Desktop**   : [AGS](https://github.com/Aylur/ags) :rocket: Framework for crafting Wayland Desktop Shells
-- **Wallpaper** : [wbg](https://codeberg.org/dnkl/wbg) :framed_picture: Super simple wallpaper application
+- 🎨 **WM**        : [Hyprland](https://github.com/hyprwm/Hyprland) - A highly customizable, dynamic tiling Wayland compositor with eye-candy effects
+- 🌸 **Colors**    : [Rosé Pine](https://rosepinetheme.com/) - A beautiful, ergonomic color palette with a retro aesthetic
+- 🐟 **Shell**     : [fish](https://fishshell.com/) - A smart, user-friendly command line shell with syntax highlighting
+- 💻 **Terminal**  : [wezterm](https://wezterm.org/) - A GPU-accelerated terminal emulator with ligatures and tabs
+- 🚀 **Desktop**   : [AGS](https://github.com/Aylur/ags) - A powerful framework for building stylish Wayland desktop widgets
+- 🖼️ **Wallpaper** : [wbg](https://codeberg.org/dnkl/wbg) - Minimalist wallpaper utility that stays out of your way
 
 # Prerequisites
 
 ```bash
-# Arch Linux (main packages)
-sudo pacman -S hyprland fish wezterm
+paru -S hyprland fish
 
 # AGS (from AUR or build from source)
-yay -S ags-hyprland-git
-# or
-paru -S ags-hyprland-git
+paru -S wezterm-git aylurs-gtk-shell-git
 ```
 
 # Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/derren/dots ~/.dotfiles
+git clone https://github.com/id0o0bi/dots ~/.dotfiles
 cd ~/.dotfiles
 
 # Symlink configurations
 ln -s $(pwd)/ags ~/.config/ags
-ln -s $(pwd)/fish ~/.config/fish
 ln -s $(pwd)/wezterm ~/.config/wezterm
 ln -s $(pwd)/hypr ~/.config/hypr
 # Add more as needed...
