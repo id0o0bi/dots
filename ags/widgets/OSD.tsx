@@ -5,6 +5,7 @@ import AstalWp from "gi://AstalWp";
 import { debounce, sh, shAsync } from "../services/util";
 import { monitorFile } from "ags/file";
 import { VERTICAL } from "../services/vars";
+import { getSpeakerIcon } from "./Components/Volume";
 
 // this is used to supress the start up notification
 // [speaker mute, microphone mute, volume]
@@ -30,7 +31,7 @@ export default function OSD() {
   };
 
   speaker.connect("notify::mute", (e) => {
-    setOsdIcon(e.get_volume_icon());
+    setOsdIcon(getSpeakerIcon(e));
     setOsdText(e.get_mute() ? "Muted" : "");
     prestine[0] ? prestine[0] = false : showOSD();
   });
@@ -42,7 +43,7 @@ export default function OSD() {
   });
 
   speaker.connect("notify::volume", (e) => {
-    setOsdIcon(e.get_volume_icon());
+    setOsdIcon(getSpeakerIcon(e));
     setOsdText(`${Math.round(e.get_volume() * 100)}%`);
     prestine[2] ? prestine[2] = false : showOSD();
   });

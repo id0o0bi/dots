@@ -9,6 +9,13 @@ const {
   audio,
 } = AstalWp.get_default()!;
 
+// Helper to get the correct icon for a speaker (headphone vs speaker)
+export const getSpeakerIcon = (speaker: AstalWp.Endpoint) => {
+  const nick = speaker.get_pw_property("node.nick") || "";
+  const isSpeaker = /speaker/i.test(nick);
+  return isSpeaker ? speaker.volumeIcon : "audio-headphones-symbolic";
+};
+
 export default function Volume() {
   let speakers = createBinding(audio, "speakers");
 
@@ -67,13 +74,13 @@ export default function Volume() {
         "volume",
       )((v) => `${Math.floor(Math.min(v, 1) * 100)}%`)}
     >
-      <Gtk.Image iconName={createBinding(speaker, "volumeIcon")} />
+      <Gtk.Image iconName={createBinding(speaker, "volumeIcon")(() => getSpeakerIcon(speaker))} />
       <Gtk.Popover hasArrow={false}>
         <Gtk.Box class="volumeRocker" orientation={VERTICAL}>
           <Gtk.Box class="control" orientation={HORIZONTAL}>
             <Gtk.Button
               class="round-btn"
-              iconName={createBinding(speaker, "volumeIcon")}
+              iconName={createBinding(speaker, "volumeIcon")(() => getSpeakerIcon(speaker))}
               onClicked={() => speaker.set_mute(!speaker.mute)}
             />
             <VolumeScale endpoint={speaker} />
