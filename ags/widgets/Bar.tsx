@@ -11,6 +11,7 @@ import TextStream from "./Components/TextStream";
 import Bluetooth from "./Components/Bluetooth";
 import DashCenter from "./Components/DashCenter";
 import { ToolsIcon } from "./Components/Tools";
+import SystemMonitor from "./Components/SystemMonitor";
 
 export default function Bar(gdkmonitor: Gdk.Monitor) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
@@ -36,6 +37,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
         </Gtk.Box>
         <Gtk.Box $type="end">
           <TextStream />
+          <SystemMonitor />
           <ToolsIcon />
           <SysTray />
           <UpdateIcon />

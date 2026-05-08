@@ -190,6 +190,16 @@ window#bar {
                 }
             }
 
+            box.system-monitor {
+                margin: 0 2px;
+                .meter-container {
+                    border: 1px solid var(--rpt-highlightMed);
+                    background-color: var(--rpt-highlightLow);
+                    border-radius: 2px;
+                    overflow: hidden;
+                }
+            }
+
             .wifiIcons {
                 image {
                     -gtk-icon-size: 16px;
