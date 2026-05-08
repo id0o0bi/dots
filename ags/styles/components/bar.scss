@@ -191,12 +191,12 @@ window#bar {
             }
 
             box.system-monitor {
-                margin: 0 2px;
+                margin: 3px 8px;
                 .meter-container {
-                    border: 1px solid var(--rpt-highlightMed);
-                    background-color: var(--rpt-highlightLow);
+                    min-width: 16px;
+                    min-height: 5px;
                     border-radius: 2px;
-                    overflow: hidden;
+                    background-color: var(--rpt-muted);
                 }
             }
 

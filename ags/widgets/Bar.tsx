@@ -37,9 +37,9 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
         </Gtk.Box>
         <Gtk.Box $type="end">
           <TextStream />
-          <SystemMonitor />
           <ToolsIcon />
           <SysTray />
+          <SystemMonitor />
           <UpdateIcon />
           <Bluetooth />
           <Wireless />

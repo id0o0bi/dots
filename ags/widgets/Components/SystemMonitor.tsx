@@ -3,8 +3,7 @@ import Gio from "gi://Gio";
 import { createState } from "ags";
 import { HORIZONTAL, VERTICAL } from "../../services/vars";
 
-const METER_HEIGHT = 16; // pixels
-const METER_WIDTH = 6; // pixels
+const METER_WIDTH = 16; // pixels
 
 interface SystemStats {
   cpu: number;
@@ -71,49 +70,38 @@ setInterval(updateStats, 1000);
 updateStats();
 
 function getColor(percent: number): string {
-  // Green (0%) -> Yellow (50%) -> Red (100%)
-  if (percent < 50) {
-    const g = Math.round(255 * (percent / 50));
-    return `rgb(${g}, 255, 0)`;
+  if (percent < 60) {
+    return `var(--rpt-pine)`;
+  } else if (percent < 80) {
+    return `var(--rpt-gold)`;
   } else {
-    const r = 255;
-    const g = Math.round(255 * ((100 - percent) / 50));
-    return `rgb(${r}, ${g}, 0)`;
+    return `var(--rpt-love)`;
   }
 }
 
 export default function SystemMonitor() {
   const meterCss = (percent: number) => {
-    const height = Math.max(1, (percent / 100) * METER_HEIGHT);
+    const width = Math.max(1, (percent / 100) * METER_WIDTH);
     const color = getColor(percent);
-    return `min-height: ${height}px; background-color: ${color}; border-radius: 0 0 1px 1px;`;
+    return `min-width: ${width}px; background-color: ${color};`;
   };
 
   return (
     <Gtk.Box
       class="system-monitor"
-      orientation={HORIZONTAL}
-      spacing={3}
-      tooltipText={stats((s) => `CPU: ${s.cpu}% | MEM: ${s.mem}%`)}
+      orientation={VERTICAL}
+      spacing={2}
+      valign={Gtk.Align.CENTER}
+      tooltipText={stats((s) => `CPU: ${s.cpu}%\nMEM: ${s.mem}%`)}
     >
       {/* CPU Meter */}
-      <Gtk.Box
-        class="meter-container"
-        orientation={VERTICAL}
-        css={`min-height: ${METER_HEIGHT}px; min-width: ${METER_WIDTH}px;`}
-      >
-        <Gtk.Box vexpand />
-        <Gtk.Box class="meter-fill cpu" css={stats((s) => meterCss(s.cpu))} />
+      <Gtk.Box overflow={Gtk.Overflow.HIDDEN} class="meter-container">
+        <Gtk.Box class="meter-fill cpu" vexpand css={stats((s) => meterCss(s.cpu))} />
       </Gtk.Box>
 
       {/* Memory Meter */}
-      <Gtk.Box
-        class="meter-container"
-        orientation={VERTICAL}
-        css={`min-height: ${METER_HEIGHT}px; min-width: ${METER_WIDTH}px;`}
-      >
-        <Gtk.Box vexpand />
-        <Gtk.Box class="meter-fill mem" css={stats((s) => meterCss(s.mem))} />
+      <Gtk.Box overflow={Gtk.Overflow.HIDDEN} class="meter-container">
+        <Gtk.Box class="meter-fill mem" vexpand css={stats((s) => meterCss(s.mem))} />
       </Gtk.Box>
     </Gtk.Box>
   );
