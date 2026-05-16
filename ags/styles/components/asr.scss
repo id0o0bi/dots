@@ -8,11 +8,12 @@ window#asr {
 
     label {
         color: var(--rpt-base);
+        font-weight: 700;
         text-shadow:
-            -1px -1px 6px var(--rpt-text),
-             1px -1px 6px var(--rpt-text),
-            -1px  1px 6px var(--rpt-text),
-             1px  1px 6px var(--rpt-text);
+            -1px -1px 2px var(--rpt-text),
+             1px -1px 2px var(--rpt-text),
+            -1px  1px 2px var(--rpt-text),
+             1px  1px 2px var(--rpt-text);
         font-size: 36px;
         font-family: 'LXGW WenKai';
     }
