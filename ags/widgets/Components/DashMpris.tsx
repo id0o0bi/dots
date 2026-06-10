@@ -47,34 +47,39 @@ const Player = (p: AstalMpris.Player): Gtk.Box => {
   );
 
   const MusicTitle = () => (
-    <Gtk.Inscription
-      text={createBinding(p, "title")}
+    <Gtk.Label
+      label={createBinding(p, "title")}
       valign={CENTER}
       vexpand
-      wrapMode={Pango.WrapMode.NONE}
-      textOverflow={Gtk.InscriptionOverflow.ELLIPSIZE_END}
+      wrap={true}
+      maxWidthChars={30}
+      ellipsize={Pango.EllipsizeMode.END}
+      xalign={0}
     />
   );
 
   const MusicAlbum = () => (
-    <Gtk.Inscription
-      text={createBinding(p, "album")}
+    <Gtk.Label
+      label={createBinding(p, "album")}
       sensitive={false}
-      wrapMode={Pango.WrapMode.NONE}
-      textOverflow={Gtk.InscriptionOverflow.ELLIPSIZE_END}
+      wrap={true}
+      maxWidthChars={30}
+      ellipsize={Pango.EllipsizeMode.END}
       hexpand
       valign={Gtk.Align.BASELINE_CENTER}
-      // xalign={0}
+      xalign={0}
     />
   );
 
   const MusicArtist = () => (
-    <Gtk.Inscription
-      text={createBinding(p, "artist").as((a) => (a ? a : ""))}
+    <Gtk.Label
+      label={createBinding(p, "artist").as((a) => (a ? a : ""))}
       sensitive={false}
-      wrapMode={Pango.WrapMode.NONE}
-      textOverflow={Gtk.InscriptionOverflow.ELLIPSIZE_END}
+      wrap={true}
+      maxWidthChars={30}
+      ellipsize={Pango.EllipsizeMode.END}
       hexpand
+      xalign={0}
     />
   );
 

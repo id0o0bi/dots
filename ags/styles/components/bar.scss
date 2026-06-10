@@ -62,11 +62,12 @@ window#bar {
         > :nth-child(2) {
             .dashButton {
                 .time {
-                    margin: 0 8px;
+                    margin: 0 4px;
                 }
             }
             .todayIcon {
-                -gtk-icon-shadow: var(--rpt-text) 1px 1px 4px;
+                -gtk-icon-size: 26px;
+                -gtk-icon-shadow: var(--rpt-overlay) 1px 1px 4px;
             }
 
             @include dashboard;

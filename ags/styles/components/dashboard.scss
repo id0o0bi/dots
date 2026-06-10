@@ -158,19 +158,16 @@
         }
 
         .weatherInfo {
-            /* background: linear-gradient(
-                to right,
-                var(--rpt-overlay),
-                var(--rpt-base),
-                var(--rpt-overlay)
-            ); */
-            /* background: var(--rpt-base-blur); */
-            /* border: 1px solid var(--rpt-muted); */
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            image.todayIcon {
-                -gtk-icon-size: 72px;
-                margin-right: var(--rpt-spacing);
+
+            image {
+                color: var(--rpt-text);
+                -gtk-icon-shadow: var(--rpt-overlay) 1px 1px 4px;
+                &.todayIcon {
+                    -gtk-icon-size: 76px;
+                    margin-right: var(--rpt-spacing);
+                }
             }
 
             .infoItem {

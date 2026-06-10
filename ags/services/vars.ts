@@ -50,6 +50,7 @@ export const WTTR_ICONS: Record<number, string> = {
   119: "cloudy", // "Cloudy",
   122: "overcast-??", // "VeryCloudy",
   143: "fog-??", // "Fog",
+  149: "fog-??", // "Fog",
   176: "partly-cloudy-??-rain", // "LightShowers",
   179: "sleet", // "LightSleetShowers",
   182: "sleet", // "LightSleet",
