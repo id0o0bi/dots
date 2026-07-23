@@ -38,9 +38,18 @@ export function WorkSpaces() {
 
 export function ClientTitle() {
   let [title, setTitle] = createState("");
-  hyprland.connect("event", () =>
-    setTitle(hyprland.get_focused_client()?.title ?? ""),
-  );
+  let cur: AstalHyprland.Client | null = null;
+  let sid: number | null = null;
+
+  const bind = () => {
+    if (cur && sid !== null) cur.disconnect(sid);
+    cur = hyprland.get_focused_client();
+    setTitle(cur?.title ?? "");
+    sid = cur?.connect("notify::title", () => setTitle(cur!.title ?? "")) ?? null;
+  };
+
+  bind();
+  hyprland.connect("notify::focused-client", bind);
 
   return (
     <Gtk.Inscription

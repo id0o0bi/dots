@@ -163,10 +163,10 @@
 
             image {
                 color: var(--rpt-text);
-                -gtk-icon-shadow: var(--rpt-overlay) 1px 1px 4px;
                 &.todayIcon {
                     -gtk-icon-size: 76px;
                     margin-right: var(--rpt-spacing);
+                    -gtk-icon-shadow: var(--rpt-muted) 1px 1px 1px;
                 }
             }
 
@@ -192,7 +192,9 @@
             font-size: 13px;
             color: var(--rpt-muted);
             image {
+                background-color: transparent;
                 margin-bottom: var(--rpt-spacing);
+                -gtk-icon-shadow: var(--rpt-muted) 1px 1px 1px;
             }
             box {
                 margin: 4px;

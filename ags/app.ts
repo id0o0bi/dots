@@ -6,6 +6,7 @@ import Launcher from "./widgets/Launcher";
 import PowerMenu from "./widgets/PowerMenu";
 import OSD from "./widgets/OSD";
 import ASR from "./widgets/ASR";
+import WindowSwitcher from "./widgets/WindowSwitcher";
 import { Popups } from "./widgets/Components/Notification";
 
 app.start({
@@ -18,6 +19,7 @@ app.start({
     PowerMenu();
     OSD();
     ASR();
+    WindowSwitcher();
   },
   requestHandler(args: string[], res: (res: any) => void) {
     return res(args[0] == "func" ? cli(args[1]) : "unknown command");

@@ -1,0 +1,43 @@
+// Window Switcher — macOS-style
+
+#switcher-backdrop {
+  background: rgba(0,0,0,0.7);
+}
+
+.switcher-panel {
+  border-radius: 20px;
+  padding: 20px 24px 16px;
+
+  &.empty {
+    padding: 32px 48px;
+  }
+}
+
+// Icon row
+.switcher-icons {
+  /* spacing set on Gtk.Box widget */
+}
+
+// Individual app icon button
+.switcher-icon {
+  all: unset;
+  padding: 6px;
+  border-radius: 14px;
+  transition: 150ms ease;
+
+  &:hover {
+    //background: var(--rpt-highlightLow);
+  }
+}
+
+// Window title below icon row
+.switcher-title {
+  font-size: 1.6em;
+  color: var(--rpt-base);
+  text-shadow:
+      -1px -1px 2px var(--rpt-text),
+       1px -1px 2px var(--rpt-text),
+      -1px  1px 2px var(--rpt-text),
+       1px  1px 2px var(--rpt-text);
+  margin-top: 12px;
+}

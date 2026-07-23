@@ -66,8 +66,8 @@ window#bar {
                 }
             }
             .todayIcon {
-                -gtk-icon-size: 26px;
-                -gtk-icon-shadow: var(--rpt-overlay) 1px 1px 4px;
+                -gtk-icon-size: 20px;
+                -gtk-icon-shadow: var(--rpt-muted) 1px 1px 1px;
             }
 
             @include dashboard;
