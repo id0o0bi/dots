@@ -1,6 +1,7 @@
 import { Gtk, Gdk } from "ags/gtk4";
-import { HORIZONTAL, VERTICAL, END } from "../../services/vars";
+import { CENTER, HORIZONTAL, VERTICAL, END, setBarAnimating } from "../../services/vars";
 import { createState, For } from "ags";
+import GLib from "gi://GLib";
 import {
   translateText,
   ocrImage,
@@ -9,6 +10,7 @@ import {
   loadHistory,
   TranslationEntry,
 } from "../../services/translator";
+import { timeElapsed } from "../../services/util";
 
 const [inputText, setInputText] = createState("");
 const [outputText, setOutputText] = createState("");
@@ -59,6 +61,7 @@ function resetAll() {
 
 async function doOcr(imagePath: string) {
   setLoading(true);
+  setBarAnimating(true);
   setIsStatusMessage(true);
   setOutputText("OCR in progress…");
   const text = await ocrImage(imagePath);
@@ -66,6 +69,7 @@ async function doOcr(imagePath: string) {
   setIsStatusMessage(false);
   setOutputText("");
   setLoading(false);
+  setBarAnimating(false);
 }
 
 function selectImageDialog(): Promise<string> {
@@ -170,12 +174,14 @@ async function doClipCapture() {
   await new Promise((r) => setTimeout(r, 150));
 
   setLoading(true);
+  setBarAnimating(true);
   setIsStatusMessage(true);
   setOutputText("Capturing…");
 
   const imagePath = await captureScreenshot();
   if (!imagePath) {
     setLoading(false);
+    setBarAnimating(false);
     setIsStatusMessage(false);
     setOutputText("");
     return;
@@ -189,6 +195,7 @@ async function doClipCapture() {
   setIsStatusMessage(false);
   setOutputText("");
   setLoading(false);
+  setBarAnimating(false);
 }
 
 async function doTranslate() {
@@ -196,6 +203,7 @@ async function doTranslate() {
   if (!text || loading()) return;
 
   setLoading(true);
+  setBarAnimating(true);
   setIsStatusMessage(true);
   setOutputText("Translating…");
 
@@ -203,6 +211,7 @@ async function doTranslate() {
   setIsStatusMessage(false);
   setOutputText(result);
   setLoading(false);
+  setBarAnimating(false);
 
   saveToHistory({ inputText: text, outputText: result, imagePath: selectedImage() || undefined });
   setHistory(loadHistory());
@@ -239,7 +248,7 @@ function HistoryList() {
               onClicked={() => {
                 setBufferText(entry.inputText);
                 setOutputText(entry.outputText);
-                if (entry.imagePath) setSelectedImage(entry.imagePath);
+                setSelectedImage(entry.imagePath || "");
                 setShowHistory(false);
               }}
             >
@@ -261,6 +270,12 @@ function HistoryList() {
                   hexpand
                   class="history-label"
                 />
+                <Gtk.Label
+                  label={timeElapsed(GLib.DateTime.new_now_local(), entry.timestamp / 1000) ?? ""}
+                  halign={Gtk.Align.START}
+                  xalign={0}
+                  class="history-time"
+                />
               </Gtk.Box>
             </Gtk.Button>
           )}
@@ -281,7 +296,7 @@ export default function Translator() {
 
   return (
     <Gtk.Box orientation={VERTICAL} spacing={6} class="translator-panel">
-      {/* Top toolbar: select image + reset */}
+      {/* Top toolbar: select image + clip */}
       <Gtk.Box orientation={HORIZONTAL} spacing={6} halign={END}>
         <Gtk.Button
           class="round-btn"
@@ -291,11 +306,12 @@ export default function Translator() {
           onClicked={doSelectImage}
         />
         <Gtk.Button
+          $={(ref) => (clipButton = ref as Gtk.Button)}
           class="round-btn"
-          label="󰎟"
-          tooltipText="Reset"
+          iconName="camera-photo-symbolic"
+          tooltipText="Clip to OCR"
           sensitive={loading.as((l) => !l)}
-          onClicked={resetAll}
+          onClicked={doClipCapture}
         />
       </Gtk.Box>
 
@@ -340,13 +356,25 @@ export default function Translator() {
         </Gtk.ScrolledWindow>
       </Gtk.Frame>
 
-      {/* Translate button */}
-      <Gtk.Button
-        class="translate-btn"
-        label="🌐 Translate"
-        sensitive={canTranslate}
-        onClicked={doTranslate}
-      />
+      {/* Translate + Copy row */}
+      <Gtk.Box orientation={HORIZONTAL} spacing={6} hexpand>
+        <Gtk.Button
+          class="round-btn translate-btn"
+          label="🌐 Translate"
+          sensitive={canTranslate}
+          hexpand
+          onClicked={doTranslate}
+        />
+        <Gtk.Button
+          $={(ref) => (copyButton = ref as Gtk.Button)}
+          class="round-btn"
+          valign={CENTER}
+          iconName="edit-copy-symbolic"
+          tooltipText="Copy translation"
+          visible={canCopy}
+          onClicked={() => copyToClipboard(outputText())}
+        />
+      </Gtk.Box>
 
       {/* Output area */}
       <Gtk.Separator
@@ -368,23 +396,14 @@ export default function Translator() {
         />
       </Gtk.ScrolledWindow>
 
-      {/* Bottom bar: clip, copy, history */}
+      {/* Bottom bar: reset + history */}
       <Gtk.Box orientation={HORIZONTAL} spacing={6} halign={END}>
         <Gtk.Button
-          $={(ref) => (clipButton = ref as Gtk.Button)}
           class="round-btn"
-          iconName="camera-photo-symbolic"
-          tooltipText="Clip to OCR"
+          label="󰎟"
+          tooltipText="Reset"
           sensitive={loading.as((l) => !l)}
-          onClicked={doClipCapture}
-        />
-        <Gtk.Button
-          $={(ref) => (copyButton = ref as Gtk.Button)}
-          class="round-btn"
-          iconName="edit-copy-symbolic"
-          tooltipText="Copy translation"
-          visible={canCopy}
-          onClicked={() => copyToClipboard(outputText())}
+          onClicked={resetAll}
         />
         <Gtk.ToggleButton
           class="round-btn"

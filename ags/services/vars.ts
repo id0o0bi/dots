@@ -13,6 +13,7 @@ export const [lineStr, setLineStr] = createState("");
 export const [asrText, setAsrText] = createState("");
 
 export const [streamProc, setStreamProc] = createState<Process|null>(null);
+export const [barAnimating, setBarAnimating] = createState(false);
 
 export const [update, setUpdates] = createState<Array<ArchUpdate>>([]);
 

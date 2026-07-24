@@ -2,9 +2,11 @@ import { Gtk } from "ags/gtk4";
 import { createState } from "ags";
 import { cmdOutBufStream } from "../../services/core";
 import {
+  barAnimating,
   CENTER,
   HORIZONTAL,
   setAsrText,
+  setBarAnimating,
   setStreamProc,
   streamProc,
   VERTICAL,
@@ -21,8 +23,8 @@ export function ToolsIcon() {
       <Gtk.MenuButton class="unset tools">
         <Gtk.Label
           valign={CENTER}
-          class={streamProc.as((s) => (s ? "animator on" : "animator"))}
-          label={streamProc.as((s) => (s ? "" : "󱙺"))}
+          class={barAnimating.as((a) => (a ? "animator on" : "animator"))}
+          label={barAnimating.as((a) => (a ? "" : "󱙺"))}
         />
         <Gtk.Popover hasArrow={false}>
           <Gtk.Box orientation={VERTICAL} class="tools-popover">
@@ -65,7 +67,9 @@ export function ToolsIcon() {
                   if (streamProc()) {
                     streamProc()?.kill();
                     setStreamProc(null);
+                    setBarAnimating(false);
                   } else {
+                    setBarAnimating(true);
                     setStreamProc(cmdOutBufStream(CMD_ASR_MIC, "asr-mic", setAsrText));
                   }
                 }}

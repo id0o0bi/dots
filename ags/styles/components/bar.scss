@@ -16,7 +16,7 @@ window#bar {
             color: var(--rpt-text);
             min-width: 340px;
         }
-        button.round-btn {
+        button.round-btn:not(.translate-btn) {
             margin-right: var(--rpt-spacing);
         }
     }
