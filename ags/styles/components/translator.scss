@@ -109,27 +109,20 @@
     }
 
 
-    // ---- language pills ----
-    .lang-row {
-        padding: 2px 0;
-    }
-
-    button.lang-pill {
-        padding: 2px 8px;
-        font-size: 0.9em;
-        background-color: transparent;
-        border: 1px solid var(--rpt-overlay);
+    // ---- language dropdown ----
+    dropdown.lang-dropdown > button {
+        padding: 4px var(--rpt-spacing);
         border-radius: var(--rpt-round);
-        color: var(--rpt-muted);
+        background-color: transparent;
+        border: none;
+        min-width: 0;
 
         &:hover {
             background-color: var(--rpt-highlightLow);
-            color: var(--rpt-text);
         }
 
-        &.active {
-            background-color: var(--rpt-highlightMed);
-            border-color: var(--rpt-highlightHigh);
+        > label {
+            min-width: 0;
             color: var(--rpt-text);
         }
     }
@@ -186,11 +179,6 @@
         label.history-time {
             font-size: 12px;
             color: var(--rpt-muted);
-        }
-
-        label.history-lang {
-            font-size: 11px;
-            color: var(--rpt-highlightHigh);
         }
     }
 

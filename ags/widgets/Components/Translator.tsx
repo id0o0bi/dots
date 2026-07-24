@@ -1,5 +1,5 @@
 import { Gtk, Gdk } from "ags/gtk4";
-import { CENTER, HORIZONTAL, VERTICAL, END, setBarAnimating } from "../../services/vars";
+import { CENTER, HORIZONTAL, START, VERTICAL, END, setBarAnimating } from "../../services/vars";
 import { createState, For } from "ags";
 import GLib from "gi://GLib";
 import {
@@ -8,22 +8,10 @@ import {
   captureScreenshot,
   saveToHistory,
   loadHistory,
-  LANG_OPTIONS,
+  LANGUAGES,
   TranslationEntry,
 } from "../../services/translator";
 import { timeElapsed } from "../../services/util";
-
-const LANG_FLAGS: Record<string, string> = {
-  auto: "🌐",
-  en: "🇬🇧",
-  zh: "🇨🇳",
-  ja: "🇯🇵",
-  fr: "🇫🇷",
-  ru: "🇷🇺",
-  ko: "🇰🇷",
-  de: "🇩🇪",
-  es: "🇪🇸",
-};
 
 const [inputText, setInputText] = createState("");
 const [outputText, setOutputText] = createState("");
@@ -60,6 +48,7 @@ outputText.subscribe(() => outputBuffer.set_text(outputText(), -1));
 let clipButton: Gtk.Button;
 let imagePicture: Gtk.Picture;
 let copyButton: Gtk.Button;
+let langDropdown: any = null;
 
 // ---- helpers ----
 
@@ -273,33 +262,20 @@ function HistoryList() {
                 setBufferText(entry.inputText);
                 setOutputText(entry.outputText);
                 setSelectedImage(entry.imagePath || "");
-                setLangDirection({
-                  inputLang: entry.inputLang || "?",
-                  outputLang: entry.outputLang || "?",
-                });
                 setOutputLang(entry.outputLang || "auto");
                 setShowHistory(false);
               }}
             >
               <Gtk.Box orientation={VERTICAL} spacing={2} hexpand>
-                <Gtk.Box orientation={HORIZONTAL} spacing={6}>
-                  <Gtk.Label
-                    label={(entry.imagePath ? "📷 | " : "") + entry.inputText.replace(/\n/g, " ⏎ ")}
-                    halign={Gtk.Align.START}
-                    xalign={0}
-                    ellipsize={3}
-                    hexpand
-                    css="color: var(--rpt-subtle);"
-                    class="history-label"
-                  />
-                  {entry.inputLang && entry.outputLang && (
-                    <Gtk.Label
-                      label={`${entry.inputLang.toUpperCase()} → ${entry.outputLang.toUpperCase()}`}
-                      class="history-lang"
-                      valign={CENTER}
-                    />
-                  )}
-                </Gtk.Box>
+                <Gtk.Label
+                  label={(entry.imagePath ? "📷 | " : "") + entry.inputText.replace(/\n/g, " ⏎ ")}
+                  halign={Gtk.Align.START}
+                  xalign={0}
+                  ellipsize={3}
+                  hexpand
+                  css="color: var(--rpt-subtle);"
+                  class="history-label"
+                />
                 <Gtk.Label
                   label={entry.outputText.replace(/\n/g, " ⏎ ")}
                   halign={Gtk.Align.START}
@@ -309,7 +285,7 @@ function HistoryList() {
                   class="history-label"
                 />
                 <Gtk.Label
-                  label={timeElapsed(GLib.DateTime.new_now_local(), entry.timestamp / 1000) ?? ""}
+                  label={`${entry.inputLang && entry.outputLang ? `${entry.inputLang.toUpperCase()} → ${entry.outputLang.toUpperCase()} · ` : ""}${timeElapsed(GLib.DateTime.new_now_local(), entry.timestamp / 1000) ?? ""}`}
                   halign={Gtk.Align.START}
                   xalign={0}
                   class="history-time"
@@ -330,6 +306,15 @@ export default function Translator() {
   selectedImage.subscribe(() => {
     const path = selectedImage();
     if (imagePicture && path) imagePicture.set_filename(path);
+  });
+
+  // Sync outputLang state to dropdown
+  outputLang.subscribe(() => {
+    if (!langDropdown) return;
+    const idx = LANGUAGES.findIndex((l) => l.code === outputLang());
+    if (idx >= 0 && langDropdown.selected !== idx) {
+      langDropdown.selected = idx;
+    }
   });
 
   return (
@@ -394,33 +379,31 @@ export default function Translator() {
         </Gtk.ScrolledWindow>
       </Gtk.Frame>
 
-      {/* Language selector */}
-      <Gtk.Box orientation={HORIZONTAL} spacing={4} class="lang-row">
-        {["auto", ...LANG_OPTIONS].map((lang) => (
-          <Gtk.Button
-            class={`lang-pill ${outputLang() === lang ? "active" : ""}`}
-            label={LANG_FLAGS[lang] || lang.toUpperCase()}
-            tooltipText={lang === "auto" ? "Auto-detect" : lang.toUpperCase()}
-            sensitive={loading.as((l) => !l)}
-            onClicked={() => setOutputLang(lang)}
-          />
-        ))}
-        {/* Lang direction indicator */}
-        <Gtk.Label
-          class="lang-direction"
-          label={langDirection.as((d) => (d.inputLang !== "?" && d.outputLang !== "?" ? `${d.inputLang.toUpperCase()} → ${d.outputLang.toUpperCase()}` : ""))}
-          visible={langDirection.as((d) => d.inputLang !== "?" && d.outputLang !== "?")}
-          hexpand
-          halign={END}
-          valign={CENTER}
-        />
-      </Gtk.Box>
-
-      {/* Translate + Copy row */}
+      {/* Translate + Lang + Copy row */}
       <Gtk.Box orientation={HORIZONTAL} spacing={6} hexpand>
+        {/* Lang dropdown */}
+        <Gtk.Box halign={START}>
+          <Gtk.DropDown
+            class="lang-dropdown"
+            sensitive={loading.as((l) => !l)}
+            hexpand={false}
+            $={(ref) => {
+              langDropdown = ref as any;
+              const list = new Gtk.StringList();
+              LANGUAGES.forEach((l) => list.append(`${l.flag} ${l.name}`));
+              langDropdown.model = list;
+              langDropdown.connect("notify::selected", () => {
+                const idx = langDropdown.selected;
+                if (idx >= 0 && idx < LANGUAGES.length) {
+                  setOutputLang(LANGUAGES[idx].code);
+                }
+              });
+            }}
+          />
+        </Gtk.Box>
         <Gtk.Button
           class="round-btn translate-btn"
-          label="🌐 Translate"
+          label="Translate"
           sensitive={canTranslate}
           hexpand
           onClicked={doTranslate}
@@ -435,6 +418,14 @@ export default function Translator() {
           onClicked={() => copyToClipboard(outputText())}
         />
       </Gtk.Box>
+
+      {/* Lang direction indicator */}
+      <Gtk.Label
+        class="lang-direction"
+        label={langDirection.as((d) => (d.inputLang !== "?" && d.outputLang !== "?" ? `${d.inputLang.toUpperCase()} → ${d.outputLang.toUpperCase()}` : ""))}
+        visible={langDirection.as((d) => d.inputLang !== "?" && d.outputLang !== "?")}
+        halign={CENTER}
+      />
 
       {/* Output area */}
       <Gtk.Separator

@@ -14,7 +14,17 @@ const LANG_LABELS: Record<string, string> = {
   es: "Spanish",
 };
 
-export const LANG_OPTIONS = Object.keys(LANG_LABELS);
+export const LANGUAGES = [
+  { code: "auto", name: "Auto", flag: "🌐" },
+  { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "zh", name: "Chinese", flag: "🇨🇳" },
+  { code: "ja", name: "Japanese", flag: "🇯🇵" },
+  { code: "fr", name: "French", flag: "🇫🇷" },
+  { code: "ru", name: "Russian", flag: "🇷🇺" },
+  { code: "ko", name: "Korean", flag: "🇰🇷" },
+  { code: "de", name: "German", flag: "🇩🇪" },
+  { code: "es", name: "Spanish", flag: "🇪🇸" },
+];
 
 export interface TranslateResult {
   inputLang: string;
@@ -114,7 +124,7 @@ export async function translateText(
   const prompt = `You are a translator. ${targetInstruction}
 
 Return ONLY a single JSON object (no markdown fences, no extra text) with these keys:
-- "input_lang": ISO 639-1 code of the detected input language (e.g. "en", "zh", "ja")
+- "input_lang": ISO 639-1 code (e.g. "en", "zh", "ja"), or "mixed" if the text contains multiple languages
 - "output_lang": ISO 639-1 code of the output language
 - "translation": the translated text
 
