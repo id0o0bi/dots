@@ -23,7 +23,6 @@ const [selectedImage, setSelectedImage] = createState("");
 const [isStatusMessage, setIsStatusMessage] = createState(false);
 const [canCopy, setCanCopy] = createState(false);
 const [outputLang, setOutputLang] = createState("auto");
-const [langDirection, setLangDirection] = createState({ inputLang: "?", outputLang: "?" });
 
 // Keep translate button sensitivity in sync with both inputText and loading
 inputText.subscribe(() => setCanTranslate(inputText().trim().length > 0 && !loading()));
@@ -62,7 +61,6 @@ function resetAll() {
   setSelectedImage("");
   setShowHistory(false);
   setOutputLang("auto");
-  setLangDirection({ inputLang: "?", outputLang: "?" });
 }
 
 async function doOcr(imagePath: string) {
@@ -216,7 +214,6 @@ async function doTranslate() {
   const result = await translateText(text, outputLang());
   setIsStatusMessage(false);
   setOutputText(result.translation);
-  setLangDirection({ inputLang: result.inputLang, outputLang: result.outputLang });
   setLoading(false);
   setBarAnimating(false);
 
@@ -418,14 +415,6 @@ export default function Translator() {
           onClicked={() => copyToClipboard(outputText())}
         />
       </Gtk.Box>
-
-      {/* Lang direction indicator */}
-      <Gtk.Label
-        class="lang-direction"
-        label={langDirection.as((d) => (d.inputLang !== "?" && d.outputLang !== "?" ? `${d.inputLang.toUpperCase()} → ${d.outputLang.toUpperCase()}` : ""))}
-        visible={langDirection.as((d) => d.inputLang !== "?" && d.outputLang !== "?")}
-        halign={CENTER}
-      />
 
       {/* Output area */}
       <Gtk.Separator
