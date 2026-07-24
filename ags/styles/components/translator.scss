@@ -108,6 +108,38 @@
         }
     }
 
+
+    // ---- language pills ----
+    .lang-row {
+        padding: 2px 0;
+    }
+
+    button.lang-pill {
+        padding: 2px 8px;
+        font-size: 0.9em;
+        background-color: transparent;
+        border: 1px solid var(--rpt-overlay);
+        border-radius: var(--rpt-round);
+        color: var(--rpt-muted);
+
+        &:hover {
+            background-color: var(--rpt-highlightLow);
+            color: var(--rpt-text);
+        }
+
+        &.active {
+            background-color: var(--rpt-highlightMed);
+            border-color: var(--rpt-highlightHigh);
+            color: var(--rpt-text);
+        }
+    }
+
+    label.lang-direction {
+        font-size: 0.85em;
+        color: var(--rpt-muted);
+        padding-left: 8px;
+    }
+
     // ---- translate button ----
     button.translate-btn {
         padding: 4px 12px;
@@ -154,6 +186,11 @@
         label.history-time {
             font-size: 12px;
             color: var(--rpt-muted);
+        }
+
+        label.history-lang {
+            font-size: 11px;
+            color: var(--rpt-highlightHigh);
         }
     }
 

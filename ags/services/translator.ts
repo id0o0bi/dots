@@ -3,11 +3,32 @@ import { _CACHE } from "./vars";
 import Gio from "gi://Gio";
 import GLib from "gi://GLib";
 
+const LANG_LABELS: Record<string, string> = {
+  en: "English",
+  zh: "Chinese",
+  ja: "Japanese",
+  fr: "French",
+  ru: "Russian",
+  ko: "Korean",
+  de: "German",
+  es: "Spanish",
+};
+
+export const LANG_OPTIONS = Object.keys(LANG_LABELS);
+
+export interface TranslateResult {
+  inputLang: string;
+  outputLang: string;
+  translation: string;
+}
+
 export interface TranslationEntry {
   id: string;
   timestamp: number;
   inputText: string;
   outputText: string;
+  inputLang?: string;
+  outputLang?: string;
   imagePath?: string;
 }
 
@@ -42,20 +63,65 @@ function deleteFile(path: string) {
   if (file.query_exists(null)) file.delete(null);
 }
 
-export async function translateText(inputText: string): Promise<string> {
+function parseTranslateResult(raw: string): TranslateResult | null {
+  const trimmed = raw.trim();
+
+  // Try direct JSON parse
+  try {
+    const obj = JSON.parse(trimmed);
+    if (obj.translation && obj.input_lang && obj.output_lang) {
+      return {
+        inputLang: obj.input_lang,
+        outputLang: obj.output_lang,
+        translation: obj.translation,
+      };
+    }
+  } catch { /* ignore */ }
+
+  // Try stripping markdown fences
+  const jsonMatch = trimmed.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+  if (jsonMatch) {
+    try {
+      const obj = JSON.parse(jsonMatch[1].trim());
+      if (obj.translation && obj.input_lang && obj.output_lang) {
+        return {
+          inputLang: obj.input_lang,
+          outputLang: obj.output_lang,
+          translation: obj.translation,
+        };
+      }
+    } catch { /* ignore */ }
+  }
+
+  return null;
+}
+
+export async function translateText(
+  inputText: string,
+  targetLang?: string,
+): Promise<TranslateResult> {
   ensureCacheDir();
 
   const promptFile = `${TRANSLATOR_CACHE}/prompt.txt`;
 
-  const prompt = `You are a translator. Detect the language of the text below and translate it.
+  const targetInstruction = targetLang && targetLang !== "auto"
+    ? `Translate the text to ${LANG_LABELS[targetLang] || targetLang}.`
+    : `Detect the language:
 - If the text is in English, translate to Chinese (Simplified).
 - If the text is in Chinese, translate to English.
-- For any other language, translate to English.
-- Return ONLY the translated text. No explanations, no quotes, no preamble.
+- For any other language, translate to English.`;
 
---- BEGIN TEXT ---
+  const prompt = `You are a translator. ${targetInstruction}
+
+Return ONLY a single JSON object (no markdown fences, no extra text) with these keys:
+- "input_lang": ISO 639-1 code of the detected input language (e.g. "en", "zh", "ja")
+- "output_lang": ISO 639-1 code of the output language
+- "translation": the translated text
+
+Text to translate:
+--- BEGIN ---
 ${inputText}
---- END TEXT ---`;
+--- END ---`;
 
   writeFile(promptFile, prompt);
 
@@ -64,11 +130,17 @@ ${inputText}
       `pi -p --no-tools --model ${LLM_MODEL} @${promptFile}`,
     ]);
     deleteFile(promptFile);
-    return result.trim();
+
+    const parsed = parseTranslateResult(result);
+    if (parsed) return parsed;
+
+    // Fallback: return raw text as translation with unknown langs
+    console.warn("Failed to parse translation JSON, using raw output:", result.slice(0, 100));
+    return { inputLang: "?", outputLang: targetLang || "?", translation: result.trim() };
   } catch (e) {
     console.error("Translation error:", e);
     deleteFile(promptFile);
-    return "Translation failed. Please try again.";
+    return { inputLang: "?", outputLang: "?", translation: "Translation failed. Please try again." };
   }
 }
 

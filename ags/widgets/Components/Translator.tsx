@@ -8,9 +8,22 @@ import {
   captureScreenshot,
   saveToHistory,
   loadHistory,
+  LANG_OPTIONS,
   TranslationEntry,
 } from "../../services/translator";
 import { timeElapsed } from "../../services/util";
+
+const LANG_FLAGS: Record<string, string> = {
+  auto: "🌐",
+  en: "🇬🇧",
+  zh: "🇨🇳",
+  ja: "🇯🇵",
+  fr: "🇫🇷",
+  ru: "🇷🇺",
+  ko: "🇰🇷",
+  de: "🇩🇪",
+  es: "🇪🇸",
+};
 
 const [inputText, setInputText] = createState("");
 const [outputText, setOutputText] = createState("");
@@ -21,6 +34,8 @@ const [canTranslate, setCanTranslate] = createState(false);
 const [selectedImage, setSelectedImage] = createState("");
 const [isStatusMessage, setIsStatusMessage] = createState(false);
 const [canCopy, setCanCopy] = createState(false);
+const [outputLang, setOutputLang] = createState("auto");
+const [langDirection, setLangDirection] = createState({ inputLang: "?", outputLang: "?" });
 
 // Keep translate button sensitivity in sync with both inputText and loading
 inputText.subscribe(() => setCanTranslate(inputText().trim().length > 0 && !loading()));
@@ -57,6 +72,8 @@ function resetAll() {
   setOutputText("");
   setSelectedImage("");
   setShowHistory(false);
+  setOutputLang("auto");
+  setLangDirection({ inputLang: "?", outputLang: "?" });
 }
 
 async function doOcr(imagePath: string) {
@@ -207,13 +224,20 @@ async function doTranslate() {
   setIsStatusMessage(true);
   setOutputText("Translating…");
 
-  const result = await translateText(text);
+  const result = await translateText(text, outputLang());
   setIsStatusMessage(false);
-  setOutputText(result);
+  setOutputText(result.translation);
+  setLangDirection({ inputLang: result.inputLang, outputLang: result.outputLang });
   setLoading(false);
   setBarAnimating(false);
 
-  saveToHistory({ inputText: text, outputText: result, imagePath: selectedImage() || undefined });
+  saveToHistory({
+    inputText: text,
+    outputText: result.translation,
+    inputLang: result.inputLang,
+    outputLang: result.outputLang,
+    imagePath: selectedImage() || undefined,
+  });
   setHistory(loadHistory());
 }
 
@@ -249,19 +273,33 @@ function HistoryList() {
                 setBufferText(entry.inputText);
                 setOutputText(entry.outputText);
                 setSelectedImage(entry.imagePath || "");
+                setLangDirection({
+                  inputLang: entry.inputLang || "?",
+                  outputLang: entry.outputLang || "?",
+                });
+                setOutputLang(entry.outputLang || "auto");
                 setShowHistory(false);
               }}
             >
               <Gtk.Box orientation={VERTICAL} spacing={2} hexpand>
-                <Gtk.Label
-                  label={(entry.imagePath ? "📷 | " : "") + entry.inputText.replace(/\n/g, " ⏎ ")}
-                  halign={Gtk.Align.START}
-                  xalign={0}
-                  ellipsize={3}
-                  hexpand
-                  css="color: var(--rpt-subtle);"
-                  class="history-label"
-                />
+                <Gtk.Box orientation={HORIZONTAL} spacing={6}>
+                  <Gtk.Label
+                    label={(entry.imagePath ? "📷 | " : "") + entry.inputText.replace(/\n/g, " ⏎ ")}
+                    halign={Gtk.Align.START}
+                    xalign={0}
+                    ellipsize={3}
+                    hexpand
+                    css="color: var(--rpt-subtle);"
+                    class="history-label"
+                  />
+                  {entry.inputLang && entry.outputLang && (
+                    <Gtk.Label
+                      label={`${entry.inputLang.toUpperCase()} → ${entry.outputLang.toUpperCase()}`}
+                      class="history-lang"
+                      valign={CENTER}
+                    />
+                  )}
+                </Gtk.Box>
                 <Gtk.Label
                   label={entry.outputText.replace(/\n/g, " ⏎ ")}
                   halign={Gtk.Align.START}
@@ -355,6 +393,28 @@ export default function Translator() {
           />
         </Gtk.ScrolledWindow>
       </Gtk.Frame>
+
+      {/* Language selector */}
+      <Gtk.Box orientation={HORIZONTAL} spacing={4} class="lang-row">
+        {["auto", ...LANG_OPTIONS].map((lang) => (
+          <Gtk.Button
+            class={`lang-pill ${outputLang() === lang ? "active" : ""}`}
+            label={LANG_FLAGS[lang] || lang.toUpperCase()}
+            tooltipText={lang === "auto" ? "Auto-detect" : lang.toUpperCase()}
+            sensitive={loading.as((l) => !l)}
+            onClicked={() => setOutputLang(lang)}
+          />
+        ))}
+        {/* Lang direction indicator */}
+        <Gtk.Label
+          class="lang-direction"
+          label={langDirection.as((d) => (d.inputLang !== "?" && d.outputLang !== "?" ? `${d.inputLang.toUpperCase()} → ${d.outputLang.toUpperCase()}` : ""))}
+          visible={langDirection.as((d) => d.inputLang !== "?" && d.outputLang !== "?")}
+          hexpand
+          halign={END}
+          valign={CENTER}
+        />
+      </Gtk.Box>
 
       {/* Translate + Copy row */}
       <Gtk.Box orientation={HORIZONTAL} spacing={6} hexpand>
