@@ -1,0 +1,188 @@
+@use "../common" as *;
+
+// ---- ASR page ----
+.asr-page {
+    padding: 2em 0;
+
+    .asr-tip {
+        font-size: 11px;
+        color: var(--rpt-muted);
+        margin-top: 8px;
+    }
+}
+
+// ---- tab bar (shared between ASR & Translator pages) ----
+.tab-bar {
+    margin-bottom: 8px;
+
+    button.tab-btn {
+        padding: 6px 18px;
+        background-color: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        border-radius: 0;
+        color: var(--rpt-muted);
+        font-size: 0.95em;
+
+        label {
+            color: var(--rpt-muted);
+        }
+
+        &:hover {
+            color: var(--rpt-text);
+            border-bottom-color: var(--rpt-overlay);
+            background-color: var(--rpt-highlightLow);
+
+            label {
+                color: var(--rpt-text);
+            }
+        }
+
+        &.active {
+            color: var(--rpt-text);
+            border-bottom-color: var(--rpt-accent);
+
+            label {
+                color: var(--rpt-text);
+            }
+        }
+    }
+}
+
+.translator-panel {
+    padding: 8px;
+    min-width: 320px;
+
+    > separator {
+        background-color: var(--rpt-overlay);
+        margin: 4px 0;
+    }
+
+    // ---- image preview ----
+    .image-preview-box {
+        border: 1px solid var(--rpt-overlay);
+        border-radius: 6px;
+        background-color: var(--rpt-surface);
+        padding: 4px;
+        min-height: 60px;
+
+        picture {
+            border-radius: 4px;
+        }
+    }
+
+    // ---- frames (input & output) ----
+    frame {
+        border: 1px solid var(--rpt-overlay);
+        border-radius: 6px;
+        background-color: var(--rpt-surface);
+
+        textview {
+            background-color: transparent;
+            color: var(--rpt-text);
+            font-family: var(--rpt-font-family);
+            font-size: 13px;
+            padding: 6px;
+
+            text {
+                background-color: transparent;
+                color: var(--rpt-text);
+            }
+        }
+
+        label {
+            color: var(--rpt-text);
+        }
+    }
+
+    // ---- output textview ----
+    textview.output-textview {
+        background-color: transparent;
+        color: var(--rpt-text);
+        font-size: 13px;
+        padding: 4px 0;
+
+        text {
+            background-color: transparent;
+            color: var(--rpt-text);
+        }
+    }
+
+    // ---- translate button ----
+    button.translate-btn {
+        padding: 6px 12px;
+        min-height: 0;
+        font-size: 1em;
+        background-color: transparent;
+        border-radius: var(--rpt-round);
+        border: none;
+
+        &:hover {
+            background-color: var(--rpt-highlightMed);
+        }
+
+        &:active {
+            background-color: var(--rpt-highlightHigh);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+        }
+    }
+
+    // ---- history scroll ----
+    scrolledwindow.history-scroll {
+        min-height: 240px;
+    }
+
+    // ---- history labels ----
+    label.history-label {
+        font-size: 12px;
+    }
+
+    // ---- history item ----
+    button.history-item {
+        background-color: transparent;
+        color: var(--rpt-text);
+        border: none;
+        border-bottom: 1px dashed var(--rpt-overlay);
+        border-radius: 0;
+        padding: 6px 4px;
+
+        &:hover {
+            background-color: var(--rpt-highlightLow);
+            border-radius: 6px;
+            border-bottom-color: transparent;
+        }
+
+        &:active {
+            background-color: var(--rpt-highlightMed);
+        }
+
+        label {
+            color: var(--rpt-text);
+        }
+    }
+
+    // ---- generic flat buttons (copy, etc.) ----
+    button:not(.round-btn):not(.translate-btn):not(.history-item) {
+        background-color: transparent;
+        border: none;
+        -gtk-icon-size: 14px;
+
+        &:hover {
+            background-color: var(--rpt-overlay);
+            border-radius: var(--rpt-round);
+        }
+    }
+
+    // ---- scrollbar ----
+    scrolledwindow {
+        scrollbar slider {
+            min-height: 4px;
+            min-width: 4px;
+            background-color: var(--rpt-muted);
+            border-radius: 2px;
+        }
+    }
+}

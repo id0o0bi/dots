@@ -32,6 +32,7 @@ export function init() {
 
   // clean up cache files over 7 days
   shAsync([`find ${_CACHE}/procs/ -type f -mtime +3 -delete`]).catch(console.error);
+  shAsync([`find ${_CACHE}/translator/ -type f -mtime +7 -delete`]).catch(console.error);
 }
 
 /**
