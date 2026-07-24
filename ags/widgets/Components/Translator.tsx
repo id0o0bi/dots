@@ -285,7 +285,7 @@ export default function Translator() {
       <Gtk.Box orientation={HORIZONTAL} spacing={6} halign={END}>
         <Gtk.Button
           class="round-btn"
-          iconName="document-open-symbolic"
+          iconName="image-x-generic-symbolic"
           tooltipText="Select Image"
           sensitive={loading.as((l) => !l)}
           onClicked={doSelectImage}
@@ -343,7 +343,7 @@ export default function Translator() {
       {/* Translate button */}
       <Gtk.Button
         class="translate-btn"
-        label="Translate"
+        label="🌐 Translate"
         sensitive={canTranslate}
         onClicked={doTranslate}
       />
