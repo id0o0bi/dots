@@ -10,7 +10,7 @@ import { Astal, Gtk, Gdk } from "ags/gtk4";
 import TextStream from "./Components/TextStream";
 import Bluetooth from "./Components/Bluetooth";
 import DashCenter from "./Components/DashCenter";
-import { ToolsIcon } from "./Components/Tools";
+import { Tools } from "./Components/Tools";
 import SystemMonitor from "./Components/SystemMonitor";
 
 export default function Bar(gdkmonitor: Gdk.Monitor) {
@@ -37,7 +37,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
         </Gtk.Box>
         <Gtk.Box $type="end">
           <TextStream />
-          <ToolsIcon />
+          <Tools />
           <SysTray />
           <SystemMonitor />
           <UpdateIcon />

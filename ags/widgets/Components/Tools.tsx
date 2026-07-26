@@ -17,7 +17,7 @@ const CMD_ASR_MIC = ["/home/derren/.local/bin/asr-mic.sh"];
 
 const [activePage, setActivePage] = createState("asr");
 
-export function ToolsIcon() {
+export function Tools() {
   return (
     <Gtk.Box class="tools-box" orientation={HORIZONTAL}>
       <Gtk.MenuButton class="unset tools">
@@ -35,8 +35,7 @@ export function ToolsIcon() {
                 onClicked={() => setActivePage("asr")}
               >
                 <Gtk.Box orientation={HORIZONTAL} spacing={6}>
-                  <Gtk.Label label="󰺹" css="font-size: 18px;" />
-                  <Gtk.Label label="ASR" />
+                  <Gtk.Label label="󰺹 ASR" />
                 </Gtk.Box>
               </Gtk.Button>
               <Gtk.Button
@@ -44,8 +43,7 @@ export function ToolsIcon() {
                 onClicked={() => setActivePage("ocr")}
               >
                 <Gtk.Box orientation={HORIZONTAL} spacing={6}>
-                  <Gtk.Label label="" css="font-size: 18px;" />
-                  <Gtk.Label label="OCR" />
+                  <Gtk.Label label=" OCR" />
                 </Gtk.Box>
               </Gtk.Button>
             </Gtk.Box>

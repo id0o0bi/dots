@@ -265,7 +265,7 @@ function HistoryList() {
             >
               <Gtk.Box orientation={VERTICAL} spacing={2} hexpand>
                 <Gtk.Label
-                  label={(entry.imagePath ? "📷 | " : "") + entry.inputText.replace(/\n/g, " ⏎ ")}
+                  label={entry.inputText.replace(/\n/g, " ⏎ ")}
                   halign={Gtk.Align.START}
                   xalign={0}
                   ellipsize={3}
@@ -282,7 +282,7 @@ function HistoryList() {
                   class="history-label"
                 />
                 <Gtk.Label
-                  label={`${entry.inputLang && entry.outputLang ? `${entry.inputLang.toUpperCase()} → ${entry.outputLang.toUpperCase()} · ` : ""}${timeElapsed(GLib.DateTime.new_now_local(), entry.timestamp / 1000) ?? ""}`}
+                  label={`${entry.imagePath ? "📷 · " : ""}${entry.inputLang && entry.outputLang ? `${entry.inputLang.toUpperCase()} → ${entry.outputLang.toUpperCase()} · ` : ""}${timeElapsed(GLib.DateTime.new_now_local(), entry.timestamp / 1000) ?? ""}`}
                   halign={Gtk.Align.START}
                   xalign={0}
                   class="history-time"
