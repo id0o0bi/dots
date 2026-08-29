@@ -7,7 +7,7 @@ local mod = "SUPER"
 hl.bind(mod .. " + SHIFT + R", hl.dsp.exec_cmd("ags quit; ags run"))
 hl.bind(mod .. " + R",         hl.dsp.exec_cmd("ags toggle launcher"))
 hl.bind(mod .. " + Escape",    hl.dsp.exec_cmd("ags toggle powermenu"))
-hl.bind(mod .. " + Tab",       hl.dsp.exec_cmd("ags toggle win-switcher"))
+hl.bind(mod .. " + Tab",       hl.dsp.exec_cmd("ags request switcher"), { repeating = false })
 
 -- Laptop media keys
 hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl set +5%"),       { repeating = true })
@@ -39,8 +39,8 @@ hl.bind(mod .. " + P",         hl.dsp.window.pin())
 hl.bind(mod .. " + Z",         hl.dsp.window.fullscreen())
 hl.bind(mod .. " + SHIFT + Z", hl.dsp.window.fullscreen_state({ internal = 0, client = 3 }))
 hl.bind(mod .. " + G",         hl.dsp.group.toggle())
-hl.bind(mod .. " + TAB",       hl.dsp.group.next())
-hl.bind(mod .. " + SHIFT + TAB", hl.dsp.group.prev())
+-- hl.bind(mod .. " + TAB",       hl.dsp.group.next())
+-- hl.bind(mod .. " + SHIFT + TAB", hl.dsp.group.prev())
 
 -- Focus (vim-style hjkl)
 hl.bind(mod .. " + k", hl.dsp.focus({ direction = "up" }))

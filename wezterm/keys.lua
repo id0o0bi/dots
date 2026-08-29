@@ -6,6 +6,7 @@ return {
     -- { key = 'RightArrow', mods = 'ALT', action = wezterm.action.ActivateTabRelative(1) },
     -- { key = 'LeftArrow',  mods = 'CTRL|SHIFT', action = wezterm.action.ActivateTabRelative(-1) },
     -- { key = 'RightArrow', mods = 'CTRL|SHIFT', action = wezterm.action.ActivateTabRelative(1) },
+    { key = 'Tab',  mods = 'SHIFT',   action = wezterm.action.SendString '\x1b[Z' },
     { key = '1', mods = 'ALT',        action = wezterm.action.ActivateTab(0) },
     { key = '2', mods = 'ALT',        action = wezterm.action.ActivateTab(1) },
     { key = '3', mods = 'ALT',        action = wezterm.action.ActivateTab(2) },

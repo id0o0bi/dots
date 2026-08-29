@@ -1,11 +1,19 @@
 import { For, createComputed, createState } from "ags";
-import { exec } from "ags/process";
+import { execAsync } from "ags/process";
 import { Astal, Gdk, Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
 import AstalHyprland from "gi://AstalHyprland";
 import AstalApps from "gi://AstalApps";
 import Gio from "gi://Gio";
 import { VERTICAL } from "../services/vars";
+
+// Exposed to the app request handler so the Hyprland `Super+Tab` bind can
+// open-or-advance instead of blindly toggling (which closed the switcher on
+// every repeated Tab press while holding Super).
+export const switcherControl = {
+  win: null as Astal.Window | null,
+  toggleOrStep: () => {},
+};
 
 const hyprland = AstalHyprland.get_default();
 let apps: AstalApps.Apps | null = null;
@@ -16,9 +24,7 @@ function getApps(): AstalApps.Apps {
 }
 
 interface SwitcherEntry {
-  client: AstalHyprland.Client;
   iconName: string | null;
-  appName: string;
   selected: boolean;
 }
 
@@ -36,15 +42,10 @@ export default function WindowSwitcher() {
   });
 
   const entries = createComputed((): SwitcherEntry[] =>
-    clients().map((c, i) => {
-      const match = _matchApp(c.class);
-      return {
-        client: c,
-        iconName: match?.iconName ?? null,
-        appName: match?.name ?? c.class,
-        selected: i === selectedIndex(),
-      };
-    }),
+    clients().map((c, i) => ({
+      iconName: _matchApp(c.class)?.iconName ?? null,
+      selected: i === selectedIndex(),
+    })),
   );
 
   // Match a Hyprland client class to an AstalApps entry for proper icon + name
@@ -79,7 +80,7 @@ export default function WindowSwitcher() {
         const bOnCurrent = b.workspace.id === focusedWs.id ? 0 : 1;
         if (aOnCurrent !== bOnCurrent) return aOnCurrent - bOnCurrent;
         if (a.workspace.id !== b.workspace.id) return a.workspace.id - b.workspace.id;
-        return b.focusHistoryID - a.focusHistoryID;
+        return b.focusHistoryId - a.focusHistoryId;
       });
 
     const focused = hyprland.get_focused_client();
@@ -93,6 +94,13 @@ export default function WindowSwitcher() {
     setSelectedIndex(startIndex);
   }
 
+  // Advance to the next window (used by the request handler when the
+  // switcher is already open and Super+Tab is pressed again).
+  function step() {
+    const max = clients().length;
+    if (max > 0) setSelectedIndex((selectedIndex() + 1) % max);
+  }
+
   function focusSelected() {
     const client = clients()[selectedIndex()];
     if (!client) {
@@ -104,9 +112,22 @@ export default function WindowSwitcher() {
       win.visible = false;
       return;
     }
-    const addr = `address:0x${current.address}`;
     win.visible = false;
-    exec(["sh", "-c", `hyprctl dispatch focuswindow '${addr}'`]);
+    focusAddress(current.address);
+  }
+
+  // Focus a Hyprland client by its address. AstalHyprland reports the
+  // address WITHOUT the "0x" prefix (e.g. "55685c2ccb00"), while hyprctl
+  // dispatchers expect the full "address:0x..." form. Hyprland >= 0.46
+  // replaced the old `focuswindow` syntax with lua dispatchers; hyprctl
+  // prints dispatch errors to stdout while still exiting 0, so this is
+  // best-effort and never throws.
+  function focusAddress(address: string) {
+    execAsync([
+      "sh",
+      "-c",
+      `hyprctl dispatch 'hl.dsp.focus({ window = "address:0x${address}" })'`,
+    ]).catch(() => undefined);
   }
 
   function onKey(
@@ -115,38 +136,20 @@ export default function WindowSwitcher() {
     _keycode: number,
     mod: number,
   ) {
+    if (keyval !== Gdk.KEY_Tab && keyval !== Gdk.KEY_ISO_Left_Tab) return;
     const max = clients().length;
-
-    if (keyval === Gdk.KEY_Escape) {
-      win.visible = false;
-      return;
-    }
-
-    if (keyval === Gdk.KEY_Return || keyval === Gdk.KEY_KP_Enter) {
-      if (max > 0) focusSelected();
-      return;
-    }
-
     if (max === 0) return;
 
     const shift = mod & Gdk.ModifierType.SHIFT_MASK;
 
-    if (keyval === Gdk.KEY_Tab || keyval === Gdk.KEY_ISO_Left_Tab) {
-      setSelectedIndex(shift
-        ? (selectedIndex() - 1 + max) % max
-        : (selectedIndex() + 1) % max);
-      return;
-    }
+    // Plain Super+Tab is handled by the Hyprland bind via the request
+    // handler (step forward). Super+Shift+Tab is unbound, so it reaches us
+    // and steps backward here.
+    if ((mod & Gdk.ModifierType.SUPER_MASK) && !shift) return;
 
-    if (keyval === Gdk.KEY_Right) {
-      setSelectedIndex((selectedIndex() + 1) % max);
-      return;
-    }
-
-    if (keyval === Gdk.KEY_Left) {
-      setSelectedIndex((selectedIndex() - 1 + max) % max);
-      return;
-    }
+    setSelectedIndex(shift
+      ? (selectedIndex() - 1 + max) % max
+      : (selectedIndex() + 1) % max);
   }
 
   // Proper icon resolution matching the Launcher's approach
@@ -189,27 +192,34 @@ export default function WindowSwitcher() {
       keymode={Astal.Keymode.EXCLUSIVE}
       layer={Astal.Layer.TOP}
       application={app}
-      $={(self) => (win = self)}
+      $={(self) => {
+        win = self;
+        switcherControl.win = self;
+        switcherControl.toggleOrStep = () => {
+          if (self.visible) step();
+          else self.visible = true;
+        };
+      }}
       onNotifyVisible={({ visible }) => {
         if (visible) snapshotClients();
       }}
     >
       <Gtk.EventControllerKey
         onKeyPressed={onKey}
+        onKeyReleased={(_e, keyval) => {
+          // Releasing Super while the switcher is open confirms the
+          // selection. Only Super matters here — Tab/Shift+Tab releases
+          // are ignored.
+          if (
+            win.visible &&
+            (keyval === Gdk.KEY_Super_L || keyval === Gdk.KEY_Super_R)
+          ) {
+            focusSelected();
+          }
+        }}
         propagationPhase={Gtk.PropagationPhase.CAPTURE}
       />
-      <Gtk.CenterBox
-        name="switcher-backdrop"
-        hexpand
-        vexpand
-        $={(self) => {
-          const gesture = new Gtk.GestureClick();
-          gesture.connect("pressed", () => {
-            win.visible = false;
-          });
-          self.add_controller(gesture);
-        }}
-      >
+      <Gtk.CenterBox name="switcher-backdrop" hexpand vexpand>
         <Gtk.Box $type="start" />
         <Gtk.Box $type="center" css="margin-top: 30px;">
           {/* Panel */}
@@ -228,18 +238,6 @@ export default function WindowSwitcher() {
                     canFocus={false}
                     class="switcher-icon"
                     valign={Gtk.Align.END}
-                    onClicked={() => {
-                      const current = hyprland
-                        .get_clients()
-                        .find((c) => c.address === entry.client.address);
-                      if (!current) {
-                        win.visible = false;
-                        return;
-                      }
-                      const addr = `address:0x${current.address}`;
-                      win.visible = false;
-                      exec(["sh", "-c", `hyprctl dispatch focuswindow '${addr}'`]);
-                    }}
                   >
                     <Gtk.Image
                       pixelSize={entry.selected ? 96 : 48}
@@ -277,7 +275,7 @@ export default function WindowSwitcher() {
               halign={Gtk.Align.CENTER}
               sensitive={false}
               css="font-size: 0.8em; opacity: 0.6;"
-              label="Esc to close"
+              label="Release to close"
             />
           </Gtk.Box>
         </Gtk.Box>

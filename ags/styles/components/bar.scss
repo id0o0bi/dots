@@ -80,6 +80,11 @@ window#bar {
                 margin-left: 4px;
             }
 
+            box.sysTray > button {
+                margin-right: var(--rpt-spacing);
+                margin-left: 4px;
+            }
+
             .err {
                 color: var(--rpt-rose);
             }
