@@ -1,5 +1,6 @@
 import { shAsync } from "./util";
 import { _CACHE } from "./vars";
+import { execAsync } from "ags/process";
 import Gio from "gi://Gio";
 import GLib from "gi://GLib";
 
@@ -48,7 +49,20 @@ const MAX_HISTORY = 100;
 const LOAD_COUNT = 20;
 
 const LLM_MODEL = "deepseek/deepseek-v4-flash";
-const OCR_MODEL = "cloudflare/google-ai-studio/gemini-3.5-flash";
+const OCR_MODEL = "cloudflare/gemini-3.5-flash-lite";
+
+// Lock pi down to a pure one-shot prompt: no default coding-assistant prompt,
+// no tools, no skills, no extensions, no prompt templates, no AGENTS.md context
+// files, and no session persistence.
+const PI_FLAGS = [
+  "-p",
+  "--no-tools",
+  "--no-skills",
+  "--no-extensions",
+  "--no-prompt-templates",
+  "--no-context-files",
+  "--no-session",
+];
 
 function ensureCacheDir() {
   const dir = Gio.File.new_for_path(TRANSLATOR_CACHE);
@@ -71,6 +85,34 @@ function writeFile(path: string, content: string) {
 function deleteFile(path: string) {
   const file = Gio.File.new_for_path(path);
   if (file.query_exists(null)) file.delete(null);
+}
+
+/**
+ * One-shot pi call for OCR/translation.
+ *
+ * Replaces pi's default coding-assistant system prompt with `systemPrompt`
+ * (the only prompt the model sees), disables tools/skills/extensions/prompt
+ * templates/context files, and attaches `inputFiles` as the user message.
+ *
+ * Runs pi directly by argv (no shell), so prompts and file paths never need
+ * quoting. Input files are referenced as @file arguments: pi treats a leading
+ * "@" in a *plain* message as a file path, so text inputs are materialized to
+ * a file by the caller first (see translateText). No session is persisted.
+ */
+async function piPrompt(
+  model: string,
+  systemPrompt: string,
+  inputFiles: string[],
+): Promise<string> {
+  return execAsync([
+    "pi",
+    ...PI_FLAGS,
+    "--model",
+    model,
+    "--system-prompt",
+    systemPrompt,
+    ...inputFiles.map((f) => `@${f}`),
+  ]);
 }
 
 function parseTranslateResult(raw: string): TranslateResult | null {
@@ -110,10 +152,6 @@ export async function translateText(
   inputText: string,
   targetLang?: string,
 ): Promise<TranslateResult> {
-  ensureCacheDir();
-
-  const promptFile = `${TRANSLATOR_CACHE}/prompt.txt`;
-
   const targetInstruction = targetLang && targetLang !== "auto"
     ? `Translate the text to ${LANG_LABELS[targetLang] || targetLang}.`
     : `Detect the language:
@@ -121,25 +159,22 @@ export async function translateText(
 - If the text is in Chinese, translate to English.
 - For any other language, translate to English.`;
 
-  const prompt = `You are a translator. ${targetInstruction}
+  const systemPrompt = `You are a translator. ${targetInstruction}
 
 Return ONLY a single JSON object (no markdown fences, no extra text) with these keys:
 - "input_lang": ISO 639-1 code (e.g. "en", "zh", "ja"), or "mixed" if the text contains multiple languages
 - "output_lang": ISO 639-1 code of the output language
-- "translation": the translated text
+- "translation": the translated text`;
 
-Text to translate:
---- BEGIN ---
-${inputText}
---- END ---`;
-
-  writeFile(promptFile, prompt);
+  // Pass the text to pi as a file argument (pi interprets a leading "@" in a
+  // plain message as a file path). One tiny temp file per call, removed after.
+  ensureCacheDir();
+  const inputFile =
+    `${TRANSLATOR_CACHE}/input-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.txt`;
+  writeFile(inputFile, inputText);
 
   try {
-    const result = await shAsync([
-      `pi -p --no-tools --model ${LLM_MODEL} @${promptFile}`,
-    ]);
-    deleteFile(promptFile);
+    const result = await piPrompt(LLM_MODEL, systemPrompt, [inputFile]);
 
     const parsed = parseTranslateResult(result);
     if (parsed) return parsed;
@@ -149,31 +184,23 @@ ${inputText}
     return { inputLang: "?", outputLang: targetLang || "?", translation: result.trim() };
   } catch (e) {
     console.error("Translation error:", e);
-    deleteFile(promptFile);
     return { inputLang: "?", outputLang: "?", translation: "Translation failed. Please try again." };
+  } finally {
+    deleteFile(inputFile);
   }
 }
 
 /** OCR an image, return extracted text, or empty string on failure. */
 export async function ocrImage(imagePath: string): Promise<string> {
-  ensureCacheDir();
-
-  const promptFile = `${TRANSLATOR_CACHE}/prompt-ocr.txt`;
-  const prompt = `You are an OCR expert. Extract all visible text from this image.
+  const systemPrompt = `You are an OCR expert. Extract all visible text from the image provided by the user.
 Return ONLY the extracted text. No explanations, no quotes, no preamble.
 If no text is found, return an empty string.`;
 
-  writeFile(promptFile, prompt);
-
   try {
-    const result = await shAsync([
-      `pi -p --no-tools --model ${OCR_MODEL} @${imagePath} @${promptFile}`,
-    ]);
-    deleteFile(promptFile);
+    const result = await piPrompt(OCR_MODEL, systemPrompt, [imagePath]);
     return result.trim();
   } catch (e) {
     console.error("OCR error:", e);
-    deleteFile(promptFile);
     return "";
   }
 }
