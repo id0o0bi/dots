@@ -42,6 +42,12 @@ hl.bind(mod .. " + G",         hl.dsp.group.toggle())
 -- hl.bind(mod .. " + TAB",       hl.dsp.group.next())
 -- hl.bind(mod .. " + SHIFT + TAB", hl.dsp.group.prev())
 
+-- Window opacity (Super + Shift + +/-)
+-- Note: resolve_binds_by_sym resolves the keysym without shift, so the
+-- '+' key (Shift+=) must be bound as "equal", not "plus".
+hl.bind(mod .. " + SHIFT + equal", hl.dsp.exec_cmd("/home/derren/.config/hypr/scripts/window_opacity.sh up"),   { repeating = true })
+hl.bind(mod .. " + SHIFT + minus", hl.dsp.exec_cmd("/home/derren/.config/hypr/scripts/window_opacity.sh down"), { repeating = true })
+
 -- Focus (vim-style hjkl)
 hl.bind(mod .. " + k", hl.dsp.focus({ direction = "up" }))
 hl.bind(mod .. " + j", hl.dsp.focus({ direction = "down" }))
