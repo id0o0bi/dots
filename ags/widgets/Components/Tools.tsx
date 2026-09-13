@@ -12,6 +12,7 @@ import {
   VERTICAL,
 } from "../../services/vars";
 import Translator from "./Translator";
+import Calc from "./Calc";
 
 const CMD_ASR_MIC = ["/home/derren/.local/bin/asr-mic.sh"];
 
@@ -44,6 +45,14 @@ export function Tools() {
               >
                 <Gtk.Box orientation={HORIZONTAL} spacing={6}>
                   <Gtk.Label label=" OCR" />
+                </Gtk.Box>
+              </Gtk.Button>
+              <Gtk.Button
+                class={activePage.as(p => p === "calc" ? "tab-btn active" : "tab-btn")}
+                onClicked={() => setActivePage("calc")}
+              >
+                <Gtk.Box orientation={HORIZONTAL} spacing={6}>
+                  <Gtk.Label label={"\u{F00EC} CALC"} />
                 </Gtk.Box>
               </Gtk.Button>
             </Gtk.Box>
@@ -85,6 +94,14 @@ export function Tools() {
               visible={activePage.as(p => p === "ocr")}
             >
               <Translator />
+            </Gtk.Box>
+
+            {/* Calculator page */}
+            <Gtk.Box
+              orientation={VERTICAL}
+              visible={activePage.as(p => p === "calc")}
+            >
+              <Calc />
             </Gtk.Box>
           </Gtk.Box>
         </Gtk.Popover>

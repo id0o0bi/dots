@@ -49,7 +49,8 @@
     }
 }
 
-.translator-panel {
+.translator-panel,
+.calc-panel {
     padding: 8px;
     min-width: 320px;
 
@@ -142,9 +143,15 @@
         min-height: 240px;
     }
 
-    // ---- history labels ----
-    label.history-label {
+    // ---- history rows (shared by the OCR and calculator lists) ----
+    button.history-item label.history-query {
         font-size: 13px;
+        color: var(--rpt-subtle);
+    }
+
+    button.history-item label.history-answer {
+        font-size: 13px;
+        font-weight: bold; // only the answer line is bold
     }
 
     // ---- history item ----
@@ -155,6 +162,9 @@
         border-bottom: 1px dashed var(--rpt-overlay);
         border-radius: 0;
         padding: 6px 4px;
+        // the Adwaita theme sets `button { font-weight: bold }`, which the
+        // labels below inherit; history rows are prose, not a button caption
+        font-weight: 400;
 
         &:hover {
             background-color: var(--rpt-highlightLow);
@@ -196,5 +206,53 @@
             background-color: var(--rpt-muted);
             border-radius: 2px;
         }
+    }
+}
+
+// ---- calculator ----
+.calc-panel {
+    // the frame draws the border/background, so flatten the entry inside it
+    // (the shared `frame textview` rules don't apply to an entry)
+    entry {
+        background: none;
+        border: none;
+        box-shadow: none;
+        color: var(--rpt-text);
+        font-size: 14px;
+        // height comes from symmetric padding rather than min-height: the
+        // content box then equals the text height, so the caret sits centred.
+        // (min-height has to be zeroed explicitly, else the theme's own 32px
+        // wins and the text centres inside a taller box instead)
+        min-height: 0;
+        padding: 16px 6px;
+
+        // no focus ring: the theme draws a 2px accent *outline* on
+        // entry:focus-within (not a box-shadow), so override that too
+        &:focus,
+        &:focus-within {
+            outline: 0 solid transparent;
+            box-shadow: none;
+        }
+    }
+
+    label.calc-hint {
+        font-size: 11px;
+        color: var(--rpt-muted);
+    }
+
+    label.calc-saved {
+        font-size: 11px;
+        color: var(--rpt-pine);
+    }
+
+    label.calc-result {
+        font-size: 20px;
+        color: var(--rpt-text);
+        padding: 2px 0;
+    }
+
+    label.calc-error {
+        font-size: 12px;
+        color: var(--rpt-love);
     }
 }

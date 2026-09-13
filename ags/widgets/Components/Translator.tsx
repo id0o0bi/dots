@@ -270,8 +270,7 @@ function HistoryList() {
                   xalign={0}
                   ellipsize={3}
                   hexpand
-                  css="color: var(--rpt-subtle);"
-                  class="history-label"
+                  class="history-query"
                 />
                 <Gtk.Label
                   label={entry.outputText.replace(/\n/g, " ⏎ ")}
@@ -279,7 +278,7 @@ function HistoryList() {
                   xalign={0}
                   ellipsize={3}
                   hexpand
-                  class="history-label"
+                  class="history-answer"
                 />
                 <Gtk.Label
                   label={`${entry.imagePath ? "⛱️ · " : ""}${entry.inputLang && entry.outputLang ? `${entry.inputLang.toUpperCase()} → ${entry.outputLang.toUpperCase()} · ` : ""}${timeElapsed(GLib.DateTime.new_now_local(), entry.timestamp / 1000) ?? ""}`}
