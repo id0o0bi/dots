@@ -1,6 +1,6 @@
 @mixin notifRow {
     row,
-    box.row {
+    revealer.row {
         padding: 0;
         min-width: 360px;
         margin-bottom: var(--rpt-spacing);
@@ -16,6 +16,10 @@
             border-radius: var(--rpt-spacing);
             padding: var(--rpt-spacing);
             /* background-color: red; */
+            label {
+                font-family: var(--rpt-font-family);
+            }
+
             .image {
                 margin-right: 4px;
             }
@@ -72,10 +76,11 @@ window#popups {
         background-color: transparent;
         @include notifRow;
         row,
-        box.row {
+        revealer.row {
             background-color: var(--rpt-base);
             border-color: var(--border-color);
-            box-shadow: 1px 1px 8px var(--rpt-overlay-blur);
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         }
     }
 }

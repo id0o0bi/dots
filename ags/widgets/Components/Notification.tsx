@@ -52,13 +52,15 @@ export const Notification = ({
       />
       <Gtk.Box class="sum" orientation={VERTICAL} hexpand vexpand={false}>
         <Gtk.Box class="title-box" hexpand>
-          <Gtk.Inscription
+          <Gtk.Label
             hexpand
             class={urgency(n.urgency)}
             valign={BASELINE_CENTER}
-            wrapMode={Pango.WrapMode.NONE}
-            textOverflow={Gtk.InscriptionOverflow.ELLIPSIZE_END}
-            text={n.summary}
+            wrap={true}
+            maxWidthChars={30}
+            ellipsize={Pango.EllipsizeMode.END}
+            xalign={0}
+            label={n.summary}
           />
           <Gtk.Button
             iconName="edit-delete-symbolic"
@@ -144,9 +146,17 @@ export const Popups = () => {
       >
         <For each={pops}>
           {(pop: AstalNotifd.Notification) => (
-            <Gtk.Box hexpand class="row">
+            <Gtk.Revealer
+              class="row"
+              hexpand
+              transitionType={Gtk.RevealerTransitionType.SLIDE_DOWN}
+              transitionDuration={300}
+              $={(ref) =>
+                ref.connect("map", () => (ref.revealChild = true))
+              }
+            >
               <Notification notification={pop} />
-            </Gtk.Box>
+            </Gtk.Revealer>
           )}
         </For>
       </Gtk.Box>
