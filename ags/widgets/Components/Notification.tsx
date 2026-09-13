@@ -38,6 +38,10 @@ export const Notification = ({
   icon = icon.replace(/^file:\/\//, "");
   let [valid, _] = Pango.parse_markup(n.body, -1, "0");
   let body = valid ? n.body : GLib.markup_escape_text(n.body, -1);
+  // GtkLabel's `lines` only limits *wrapped* text, so hard breaks would push
+  // the body past the limit; show the breaks as a return symbol instead, which
+  // keeps the paragraph structure readable while letting the label clamp.
+  body = body.replace(/\s*\n+\s*/g, " ⏎ ");
   return (
     <Gtk.Box class="content" valign={START} vexpand={false} hexpand>
       <Adw.Avatar
@@ -56,7 +60,6 @@ export const Notification = ({
             hexpand
             class={urgency(n.urgency)}
             valign={BASELINE_CENTER}
-            wrap={true}
             maxWidthChars={30}
             ellipsize={Pango.EllipsizeMode.END}
             xalign={0}
@@ -73,6 +76,8 @@ export const Notification = ({
           class="body"
           wrap
           wrapMode={Gtk.WrapMode.WORD}
+          lines={5}
+          ellipsize={Pango.EllipsizeMode.END}
           useMarkup
           sensitive={false}
           hexpand
