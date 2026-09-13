@@ -1,9 +1,53 @@
-import { createBinding, For, With } from "ags";
+import { Accessor, createBinding, createConnection, For, With } from "ags";
 import { Gtk } from "ags/gtk4";
 import { execAsync } from "ags/process";
 import AstalNetwork from "gi://AstalNetwork";
 import { checkIcon } from "../../services/util";
 import { CENTER, END, HORIZONTAL, VERTICAL } from "../../services/vars";
+
+const signalIcons: [number, string][] = [
+  [80, "network-wireless-signal-excellent-symbolic"],
+  [60, "network-wireless-signal-good-symbolic"],
+  [40, "network-wireless-signal-ok-symbolic"],
+  [20, "network-wireless-signal-weak-symbolic"],
+  [0, "network-wireless-signal-none-symbolic"],
+];
+
+/**
+ * astal only recomputes `Wifi.iconName` when the NM device/client notifies, never when the signal
+ * strength changes, and it falls back to Adwaita's `network-wireless-connected-symbolic` - which is
+ * drawn with fill-opacity 0.35, i.e. grey - whenever it cannot resolve the active access point.
+ * Both leave a perfectly healthy connection looking washed out, so derive the icon here instead.
+ */
+export function wifiIcon(wifi: AstalNetwork.Wifi): string {
+  if (!wifi.enabled) return "network-wireless-disabled-symbolic";
+  if (wifi.internet === AstalNetwork.Internet.CONNECTING)
+    return "network-wireless-acquiring-symbolic";
+  if (wifi.internet !== AstalNetwork.Internet.CONNECTED)
+    return "network-wireless-offline-symbolic";
+
+  const ap = wifi.activeAccessPoint;
+  if (!ap) return "network-wireless-symbolic";
+  return signalIcons.find(([min]) => ap.strength >= min)![1];
+}
+
+function WifiImage({
+  wifi,
+  pixelSize,
+}: {
+  wifi: AstalNetwork.Wifi;
+  pixelSize?: number;
+}) {
+  const refresh = () => wifiIcon(wifi);
+  const iconName: Accessor<string> = createConnection(
+    refresh(),
+    [wifi, "notify::enabled", refresh],
+    [wifi, "notify::internet", refresh],
+    [wifi, "notify::strength", refresh],
+    [wifi, "notify::active-access-point", refresh],
+  );
+  return <Gtk.Image iconName={iconName} pixelSize={pixelSize ?? -1} />;
+}
 
 export default function Wireless() {
   const network = AstalNetwork.get_default();
@@ -36,15 +80,12 @@ export default function Wireless() {
         {(wifi) =>
           wifi && (
             <Gtk.MenuButton class="unset">
-              <Gtk.Image iconName={createBinding(wifi, "iconName")} />
+              <WifiImage wifi={wifi} />
               <Gtk.Popover hasArrow={false}>
                 <Gtk.Box orientation={VERTICAL}>
                   <Gtk.Box css="margin-bottom: 8px;" orientation={HORIZONTAL}>
                     <Gtk.Box hexpand={true}>
-                      <Gtk.Image
-                        iconName={createBinding(wifi, "iconName")}
-                        pixelSize={48}
-                      />
+                      <WifiImage wifi={wifi} pixelSize={48} />
                     </Gtk.Box>
                     <Gtk.Box
                       hexpand={false}

@@ -12,7 +12,6 @@ import {
 import { WeatherData, WeatherItem } from "../../services/type";
 import { createComputed, createState, For } from "ags";
 import { sh, to24HM } from "../../services/util";
-import SvgIcon from "./SvgIcon";
 
 const icon_file = {
   na: `${ASSETS}/wttr/na.svg`,
@@ -72,7 +71,7 @@ const rewriteTime = (timeStr: string): string => {
 
 export function TodayIcon() {
   return (
-    <SvgIcon
+    <Gtk.Image
       class="todayIcon"
       file={nowDetail((d) => _getWeatherCode(d.weatherCode ?? 113, isNight()))}
     />
@@ -87,14 +86,14 @@ export function DashWeatherInfo() {
         <Gtk.Box homogeneous={true} hexpand={true}>
           <Gtk.Box valign={CENTER} orientation={VERTICAL}>
             <Gtk.Box class="infoItem">
-              <SvgIcon file={`${icon_file["sr"]}`} />
+              <Gtk.Image file={`${icon_file["sr"]}`} />
               <Gtk.Label
                 sensitive={false}
                 label={nowDetail((d) => d.sunrise ?? "N/A")}
               />
             </Gtk.Box>
             <Gtk.Box class="infoItem">
-              <SvgIcon file={`${icon_file["mr"]}`} />
+              <Gtk.Image file={`${icon_file["mr"]}`} />
               <Gtk.Label
                 sensitive={false}
                 label={nowDetail((d) => d.sunset ?? "N/A")}
@@ -103,14 +102,14 @@ export function DashWeatherInfo() {
           </Gtk.Box>
           <Gtk.Box valign={CENTER} orientation={VERTICAL}>
             <Gtk.Box class="infoItem">
-              <SvgIcon file={`${icon_file["hu"]}`} />
+              <Gtk.Image file={`${icon_file["hu"]}`} />
               <Gtk.Label
                 sensitive={false}
                 label={nowDetail((d) => `${d.humidity ?? ""}%`)}
               />
             </Gtk.Box>
             <Gtk.Box class="infoItem">
-              <SvgIcon file={`${icon_file["tp"]}`} />
+              <Gtk.Image file={`${icon_file["tp"]}`} />
               <Gtk.Label
                 sensitive={false}
                 label={nowDetail((d) => `${d.temp ?? ""}°C`)}
@@ -147,7 +146,7 @@ export function DashWeatherForcast() {
       <For each={hourDetail}>
         {(h) => (
           <Gtk.Box orientation={Gtk.Orientation.VERTICAL}>
-            <SvgIcon sensitive={false} file={_getWeatherItemIcon(h)} />
+            <Gtk.Image sensitive={false} file={_getWeatherItemIcon(h)} />
             <Gtk.Label
               sensitive={false}
               label={`${h.hour.toString().padStart(2, "0")}:00`}

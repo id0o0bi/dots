@@ -1,6 +1,67 @@
-import { createBinding, For } from "ags";
+import { createBinding, createState, For } from "ags";
 import { Gtk } from "ags/gtk4";
 import AstalTray from "gi://AstalTray";
+import GLib from "gi://GLib";
+
+/**
+ * WeChat's tray icon.
+ *
+ * WeChat animates its tray icon while there are unread messages and sends
+ * nothing once they are read - it never sets SNI status, and its frames carry
+ * no red badge (all verified with a probe), so animation IS the unread signal:
+ * any frame -> attention, none for QUIET_MS -> back to normal.
+ *
+ * We swap in a symbolic icon from our own theme (`assets/icons`, added to the
+ * icon search path in init()) so GTK tints it with the bar colour; the
+ * attention variant just adds a <circle class="error"> dot. Other apps keep
+ * their own (colored) gicon.
+ */
+
+const WECHAT_ICON = "ags-wechat-symbolic";
+const WECHAT_ATTENTION_ICON = "ags-wechat-attention-symbolic";
+const QUIET_MS = 1000; // no frames this long -> read (frames come every ~0.4s)
+
+function WechatIcon({ item }: { item: AstalTray.TrayItem }) {
+  // WeChat only sends frames while unread, so "flickering" is the whole state;
+  // the icon is a pure function of it.
+  const [flickering, setFlickering] = createState(false);
+
+  return (
+    <Gtk.Image
+      iconName={flickering.as((f) =>
+        f ? WECHAT_ATTENTION_ICON : WECHAT_ICON,
+      )}
+      $={(self: Gtk.Image) => {
+        let timer = 0;
+
+        const onFrame = () => {
+          setFlickering(true);
+          if (timer) GLib.source_remove(timer);
+          timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, QUIET_MS, () => {
+            timer = 0;
+            setFlickering(false);
+            return GLib.SOURCE_REMOVE;
+          });
+        };
+
+        const ids = [
+          item.connect("notify::icon-pixbuf", onFrame),
+          item.connect("notify::gicon", onFrame),
+        ];
+
+        self.connect("destroy", () => {
+          ids.forEach((id) => item.disconnect(id));
+          if (timer) GLib.source_remove(timer);
+        });
+      }}
+    />
+  );
+}
+
+function TrayItemIcon({ item }: { item: AstalTray.TrayItem }) {
+  if (item.id === "wechat") return <WechatIcon item={item} />;
+  return <Gtk.Image gicon={createBinding(item, "gicon")} />;
+}
 
 export default function Tray() {
   const tray = AstalTray.get_default();
@@ -71,7 +132,7 @@ export default function Tray() {
             tooltipText={createBinding(item, "tooltipText")}
             $={(self) => init(self, item)}
           >
-            <Gtk.Image gicon={createBinding(item, "gicon")} />
+            <TrayItemIcon item={item} />
           </Gtk.Button>
         )}
       </For>

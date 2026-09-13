@@ -1,6 +1,7 @@
 import app from "ags/gtk4/app";
+import { Gdk, Gtk } from "ags/gtk4";
 import { sh, shAsync } from "./util";
-import { _CACHE, CONFIG, SCSS_CACHE } from "./vars";
+import { _CACHE, ASSETS, CONFIG, SCSS_CACHE } from "./vars";
 import { monitorFile, readFile } from "ags/file";
 import { isNight } from "../widgets/Components/Weather";
 import { Process, subprocess } from "ags/process";
@@ -10,6 +11,11 @@ import { applyTheme } from "./themes";
 import { setUpdating } from "../widgets/Components/Updates";
 
 export function init() {
+  // expose assets/icons/hicolor/... to GTK, for the symbolic systray icons
+  Gtk.IconTheme.get_for_display(Gdk.Display.get_default()!).add_search_path(
+    `${ASSETS}/icons`,
+  );
+
   // compile scss once on startup (generates the base CSS with structural styles)
   if (!readFile(SCSS_CACHE)) _compileScss();
 
