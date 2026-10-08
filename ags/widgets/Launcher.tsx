@@ -1,4 +1,4 @@
-import { For, createComputed, createState } from "ags";
+import { For, createComputed, createEffect, createState } from "ags";
 import { Astal, Gtk, Gdk } from "ags/gtk4";
 import AstalApps from "gi://AstalApps";
 import Gio from "gi://Gio";
@@ -28,12 +28,19 @@ export default function Launcher() {
     ),
   );
 
-  // sort apps, clean FlowBox, rerender list
+  // sort apps, take the current page
   const pageData = createComputed(() => {
     let [p, d] = [page(), data()];
     d.sort((a, b) => b.frequency - a.frequency);
     return d.slice((p - 1) * cols * rows, p * cols * rows);
   });
+
+  // one fixed cell per grid slot, only its content is reactive.
+  // Gtk.FlowBox keeps the inner widget parented when a child is removed
+  // (gtk 4.24), so any add/remove churn leaves blank cells behind.
+  const slotApps = Array.from({ length: cols * rows }, (_, i) =>
+    createComputed(() => pageData()[i] ?? null),
+  );
 
   function search(text: string) {
     if (text.trim() !== "") setData(apps.fuzzy_query(text));
@@ -68,7 +75,7 @@ export default function Launcher() {
 
     for (const i of [1, 2, 3, 4, 5, 6, 7, 8, 9] as const) {
       if (keyval === Gdk[`KEY_${i}`]) {
-        return launch(data()[i - 1]);
+        return launch(pageData()[i - 1]);
       }
     }
 
@@ -222,35 +229,51 @@ export default function Launcher() {
             homogeneous
             maxChildrenPerLine={6}
             valign={Gtk.Align.START}
+            $={(ref) =>
+              // the theme hovers the flowboxchild wrapper, so empty slots
+              // must not be pointer targets
+              createEffect(() => {
+                pageData();
+                slotApps.forEach((app, i) =>
+                  ref
+                    .get_child_at_index(i)
+                    ?.set_can_target(app.peek() !== null),
+                );
+              })
+            }
           >
-            <For each={pageData}>
-              {(app, index) => (
-                <Gtk.Button class="app-item" onClicked={() => launch(app)}>
-                  <Gtk.Box valign={CENTER} orientation={VERTICAL}>
-                    <Gtk.Label
-                      $type="overlay"
-                      class="overlay-tip"
-                      hexpand
-                      halign={Gtk.Align.START}
-                      label={index((i) => (i < 9 ? `󰘳 ${i + 1}` : " "))}
-                    />
-                    <Gtk.Image
-                      pixelSize={72}
-                      $={(ref) => setAppIcon(ref, app.iconName) }
-                    />
-                    <Gtk.Inscription
-                      text={app.name}
-                      natLines={2}
-                      textOverflow={Gtk.InscriptionOverflow.ELLIPSIZE_MIDDLE}
-                      hexpand={true}
-                      xalign={0.5}
-                      yalign={0.5}
-                      tooltip-text={app.name}
-                    />
-                  </Gtk.Box>
-                </Gtk.Button>
-              )}
-            </For>
+            {slotApps.map((app, index) => (
+              <Gtk.Button
+                class="app-item"
+                visible={app((a) => a !== null)}
+                onClicked={() => launch(app.peek() ?? undefined)}
+              >
+                <Gtk.Box valign={CENTER} orientation={VERTICAL}>
+                  <Gtk.Label
+                    $type="overlay"
+                    class="overlay-tip"
+                    hexpand
+                    halign={Gtk.Align.START}
+                    label={index < 9 ? `󰘳 ${index + 1}` : " "}
+                  />
+                  <Gtk.Image
+                    pixelSize={72}
+                    $={(ref) =>
+                      createEffect(() => setAppIcon(ref, app()?.iconName))
+                    }
+                  />
+                  <Gtk.Inscription
+                    text={app((a) => a?.name ?? "")}
+                    natLines={2}
+                    textOverflow={Gtk.InscriptionOverflow.ELLIPSIZE_MIDDLE}
+                    hexpand={true}
+                    xalign={0.5}
+                    yalign={0.5}
+                    tooltip-text={app((a) => a?.name ?? "")}
+                  />
+                </Gtk.Box>
+              </Gtk.Button>
+            ))}
           </Gtk.FlowBox>
         </Gtk.Box>
         <Gtk.Box $type="end" vexpand halign={CENTER}>
