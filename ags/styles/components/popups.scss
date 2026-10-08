@@ -15,12 +15,14 @@
         .content {
             border-radius: var(--rpt-spacing);
             padding: var(--rpt-spacing);
+            padding-bottom: 12px;
             /* background-color: red; */
             label {
                 font-family: var(--rpt-font-family);
             }
 
             .image {
+                margin-top: 2px;
                 margin-right: var(--rpt-spacing);
             }
 

@@ -48,8 +48,8 @@ const HISTORY_FILE = `${TRANSLATOR_CACHE}/history.jsonl`;
 const MAX_HISTORY = 100;
 const LOAD_COUNT = 20;
 
-const LLM_MODEL = "deepseek/deepseek-v4-flash";
-const OCR_MODEL = "cloudflare/gemini-3.5-flash-lite";
+const LLM_MODEL = "deepseek/deepseek-flash";
+const OCR_MODEL = "deepseek/deepseek-flash";
 
 // Lock pi down to a pure one-shot prompt: no default coding-assistant prompt,
 // no tools, no skills, no extensions, no prompt templates, no AGENTS.md context

@@ -3,7 +3,7 @@ hl.env("GTK_IM_MODULE",                       "fcitx5")
 hl.env("SDL_IM_MODULE",                       "fcitx5")
 hl.env("QT_IM_MODULE",                        "fcitx5")
 hl.env("XMODIFIERS",                          "@im=fcitx5")
-hl.env("GDK_SCALE",                           "2")
+hl.env("GDK_SCALE",                           "1")
 hl.env("QT_SCALE_FACTOR",                     "1")
 hl.env("QT_AUTO_SCREEN_SCALE_FACTOR",         "0")
 hl.env("QT_ENABLE_HIGHDPI_SCALING",           "1")
@@ -12,6 +12,9 @@ hl.env("XCURSOR_SIZE",                        "24")
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
 hl.env("GDK_BACKEND",                         "wayland,x11")
 hl.env("XCURSOR_THEME",                       "Bibata-Modern-Amber")
+-- mpv-mpris2 logs "Broken pipe" when an MPRIS client (ags) queries it during mpv's
+-- shutdown; harmless, silence just that module
+hl.env("RUST_LOG",                           "mpv_mpris2::mpv::ipc=off")
 
 -- General & input
 hl.config({
